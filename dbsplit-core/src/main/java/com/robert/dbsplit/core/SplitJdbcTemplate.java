@@ -22,21 +22,13 @@ import org.springframework.jdbc.core.StatementCallback;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.jdbc.support.rowset.SqlRowSet;
 
-import com.alibaba.druid.sql.parser.Lexer;
-import com.alibaba.druid.sql.parser.Token;
-
 public class SplitJdbcTemplate implements SplitJdbcOperations {
-	protected SplitStrategy dbSplitStrategy;
-	protected List<SplitNode> dbNodes;
-	protected List<SplitTable> dbCells;
+	protected SplitTablesHolder splitTablesHolder;
 	protected boolean readWriteSeparate = true;
 
-	public SplitJdbcTemplate(SplitStrategy dbSplitStrategy,
-			List<SplitNode> dbNodes, List<SplitTable> dbCells,
+	public SplitJdbcTemplate(SplitTablesHolder splitTablesHolder,
 			boolean readWriteSeparate) {
-		this.dbSplitStrategy = dbSplitStrategy;
-		this.dbNodes = dbNodes;
-		this.dbCells = dbCells;
+		this.splitTablesHolder = splitTablesHolder;
 		this.readWriteSeparate = readWriteSeparate;
 	}
 
@@ -245,18 +237,28 @@ public class SplitJdbcTemplate implements SplitJdbcOperations {
 
 	public <T, K> T queryForObject(K splitKey, String sql, Object[] args,
 			Class<T> requiredType) throws DataAccessException {
-		int dbNo = this.dbSplitStrategy.getDbNo(splitKey);
-		int tableNo = this.dbSplitStrategy.getTableNo(splitKey);
+		String[] dbTableNames = SqlUtils.getDbTableNames(sql);
+		String dbName = dbTableNames[0];
+		String tableName = dbTableNames[1];
+
+		SplitTable splitTable = splitTablesHolder.searchSplitTable(dbName,
+				tableName);
+
+		SplitStrategy splitStrategy = splitTable.getHashSplitStrategy();
+		List<SplitNode> splitNdoes = splitTable.getSplitNode();
+
+		int dbNo = splitStrategy.getDbNo(splitKey);
+		int tableNo = splitStrategy.getTableNo(splitKey);
 		sql = SqlUtils.splitSelectSql(sql, dbNo, tableNo);
 
-		int nodeNo = this.dbSplitStrategy.getNodeNo(splitKey);
-		SplitNode sn = this.dbNodes.get(nodeNo);
-		
+		int nodeNo = splitStrategy.getNodeNo(splitKey);
+		SplitNode sn = splitNdoes.get(nodeNo);
+
 		JdbcTemplate jt = null;
-		
+
 		if (this.readWriteSeparate)
 			jt = sn.getRandomSlaveTempate();
-		else 
+		else
 			jt = sn.getMasterTemplate();
 
 		return jt.queryForObject(sql, args, requiredType);
@@ -348,19 +350,24 @@ public class SplitJdbcTemplate implements SplitJdbcOperations {
 
 	public <K> int update(K splitKey, String sql, Object... args)
 			throws DataAccessException {
-		int dbNo = this.dbSplitStrategy.getDbNo(splitKey);
-		int tableNo = this.dbSplitStrategy.getTableNo(splitKey);
+		String[] dbTableNames = SqlUtils.getDbTableNames(sql);
+		String dbName = dbTableNames[0];
+		String tableName = dbTableNames[1];
+
+		SplitTable splitTable = splitTablesHolder.searchSplitTable(dbName,
+				tableName);
+
+		SplitStrategy splitStrategy = splitTable.getHashSplitStrategy();
+		List<SplitNode> splitNdoes = splitTable.getSplitNode();
+
+		int dbNo = splitStrategy.getDbNo(splitKey);
+		int tableNo = splitStrategy.getTableNo(splitKey);
 		sql = SqlUtils.splitUpdateSql(sql, dbNo, tableNo);
 
-		int nodeNo = this.dbSplitStrategy.getNodeNo(splitKey);
-		SplitNode sn = this.dbNodes.get(nodeNo);
-		
-		JdbcTemplate jt = null;
-		
-		if (this.readWriteSeparate)
-			jt = sn.getRandomSlaveTempate();
-		else 
-			jt = sn.getMasterTemplate();
+		int nodeNo = splitStrategy.getNodeNo(splitKey);
+		SplitNode sn = splitNdoes.get(nodeNo);
+
+		JdbcTemplate jt = sn.getMasterTemplate();
 
 		return jt.update(sql, args);
 

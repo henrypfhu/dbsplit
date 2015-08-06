@@ -1,13 +1,10 @@
 package com.robert.dbsplit.core;
 
-import java.util.List;
-
 public class SplitBizTemplate extends SplitJdbcTemplate implements
 		SplitBizOperations {
-	public SplitBizTemplate(SplitStrategy dbSplitStrategy,
-			List<SplitNode> dbNodes, List<SplitTable> dbCells,
+	public SplitBizTemplate(SplitTablesHolder splitTablesHolder,
 			boolean readWriteSeparate) {
-		super(dbSplitStrategy, dbNodes, dbCells, readWriteSeparate);
+		super(splitTablesHolder, readWriteSeparate);
 	}
 
 	public <T, K> void insert(K splitKey, T object) {

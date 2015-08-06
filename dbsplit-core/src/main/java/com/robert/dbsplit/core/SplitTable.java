@@ -1,32 +1,31 @@
 package com.robert.dbsplit.core;
 
+import java.util.List;
+
 public class SplitTable {
-	private String tableName;
-	private String dbName;
+	private String dbNamePrifix;
+	private String tableNamePrifix;
+
 	private int dbNum;
 	private int tableNum;
 
-	public SplitTable(String tableName, String dbName, int dbNum, int tableNum) {
-		this.tableName = tableName;
-		this.dbName = dbName;
-		this.dbNum = dbNum;
-		this.tableNum = tableNum;
+	private List<SplitNode> splitNode;
+	private HashSplitStrategy hashSplitStrategy;
+
+	public String getDbNamePrifix() {
+		return dbNamePrifix;
 	}
 
-	public String getDbName() {
-		return dbName;
+	public void setDbNamePrifix(String dbNamePrifix) {
+		this.dbNamePrifix = dbNamePrifix;
 	}
 
-	public void setDbName(String dbName) {
-		this.dbName = dbName;
+	public String getTableNamePrifix() {
+		return tableNamePrifix;
 	}
 
-	public String getTableName() {
-		return tableName;
-	}
-
-	public void setTableName(String tableName) {
-		this.tableName = tableName;
+	public void setTableNamePrifix(String tableNamePrifix) {
+		this.tableNamePrifix = tableNamePrifix;
 	}
 
 	public int getDbNum() {
@@ -43,5 +42,21 @@ public class SplitTable {
 
 	public void setTableNum(int tableNum) {
 		this.tableNum = tableNum;
+	}
+
+	public List<SplitNode> getSplitNode() {
+		return splitNode;
+	}
+
+	public void setSplitNode(List<SplitNode> splitNode) {
+		this.splitNode = splitNode;
+	}
+
+	public HashSplitStrategy getHashSplitStrategy() {
+		return hashSplitStrategy;
+	}
+
+	public void setHashSplitStrategy(HashSplitStrategy hashSplitStrategy) {
+		this.hashSplitStrategy = hashSplitStrategy;
 	}
 }
