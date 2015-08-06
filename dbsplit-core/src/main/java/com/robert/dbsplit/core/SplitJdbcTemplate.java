@@ -24,16 +24,23 @@ import org.springframework.jdbc.support.rowset.SqlRowSet;
 
 public class SplitJdbcTemplate implements SplitJdbcOperations {
 	protected SplitTablesHolder splitTablesHolder;
-	protected boolean readWriteSeparate = true;
 
 	public SplitJdbcTemplate() {
-		
+
 	}
-	
-	public SplitJdbcTemplate(SplitTablesHolder splitTablesHolder,
-			boolean readWriteSeparate) {
+
+	public SplitJdbcTemplate(SplitTablesHolder splitTablesHolder) {
 		this.splitTablesHolder = splitTablesHolder;
-		this.readWriteSeparate = readWriteSeparate;
+	}
+
+	public SplitJdbcTemplate(List<String> ipPorts, String user,
+			String password, String... tables) {
+		this.addTable(ipPorts, user, password, tables);
+	}
+
+	public void addTable(List<String> ipPorts, String user, String password,
+			String... tables) {
+		// TODO parse datasources and tables
 	}
 
 	public <T, K> T execute(K splitKey, ConnectionCallback<T> action)
@@ -260,7 +267,7 @@ public class SplitJdbcTemplate implements SplitJdbcOperations {
 
 		JdbcTemplate jt = null;
 
-		if (this.readWriteSeparate)
+		if (splitTable.isReadWriteSeparate())
 			jt = sn.getRandomSlaveTempate();
 		else
 			jt = sn.getMasterTemplate();
@@ -429,13 +436,5 @@ public class SplitJdbcTemplate implements SplitJdbcOperations {
 
 	public void setSplitTablesHolder(SplitTablesHolder splitTablesHolder) {
 		this.splitTablesHolder = splitTablesHolder;
-	}
-
-	public boolean isReadWriteSeparate() {
-		return readWriteSeparate;
-	}
-
-	public void setReadWriteSeparate(boolean readWriteSeparate) {
-		this.readWriteSeparate = readWriteSeparate;
 	}
 }

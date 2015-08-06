@@ -1,14 +1,42 @@
 package com.robert.dbsplit.core;
 
-public class HashSplitStrategy implements SplitStrategy {
+public class VerticalHashSplitStrategy implements SplitStrategy {
 	private int portNum;
 	private int dbNum;
 	private int tableNum;
 
-	public HashSplitStrategy(int portNum, int dbNum, int tableNum) {
+	public VerticalHashSplitStrategy() {
+
+	}
+
+	public VerticalHashSplitStrategy(int portNum, int dbNum, int tableNum) {
 		this.portNum = portNum;
 		this.dbNum = dbNum;
 		this.tableNum = tableNum;
+	}
+
+	public int getPortNum() {
+		return portNum;
+	}
+
+	public void setPortNum(int portNum) {
+		this.portNum = portNum;
+	}
+
+	public int getTableNum() {
+		return tableNum;
+	}
+
+	public void setTableNum(int tableNum) {
+		this.tableNum = tableNum;
+	}
+
+	public int getDbNum() {
+		return dbNum;
+	}
+
+	public void setDbNum(int dbNum) {
+		this.dbNum = dbNum;
 	}
 
 	public int getNodeNo(Object splitKey) {

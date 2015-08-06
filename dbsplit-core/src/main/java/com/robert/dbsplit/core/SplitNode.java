@@ -20,7 +20,8 @@ public class SplitNode {
 		this.slaveTemplates = slaveTemplates;
 	}
 
-	public SplitNode(JdbcTemplate masterTemplate, JdbcTemplate... slaveTemplates) {
+	public SplitNode(JdbcTemplate masterTemplate,
+			JdbcTemplate... slaveTemplates) {
 		this.masterTemplate = masterTemplate;
 		this.slaveTemplates = Arrays.asList(slaveTemplates);
 	}

@@ -29,8 +29,7 @@ public abstract class SqlUtils {
 			}
 		}
 
-
-		return new String[]{dbName, tableName};
+		return new String[] { dbName, tableName };
 	}
 
 	public static String splitSelectSql(String sql, int dbNo, int tableNo) {

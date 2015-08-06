@@ -3,29 +3,43 @@ package com.robert.dbsplit.core;
 import java.util.List;
 
 public class SplitTable {
-	private String dbNamePrifix;
-	private String tableNamePrifix;
+	private String dbNamePrefix;
+	private String tableNamePrefix;
 
 	private int dbNum;
 	private int tableNum;
 
-	private List<SplitNode> splitNodes;
+	private SplitStrategyType splitStrategyType;
 	private SplitStrategy splitStrategy;
+	private List<SplitNode> splitNodes;
 
-	public String getDbNamePrifix() {
-		return dbNamePrifix;
+	private boolean readWriteSeparate = true;
+
+	public void init() {
+		if (splitStrategyType == SplitStrategyType.VERTICAL)
+			this.splitStrategy = new VerticalHashSplitStrategy();
+		else if (splitStrategyType == SplitStrategyType.HORIZONTAL)
+			this.splitStrategy = new HorizontalHashSplitStrategy();
 	}
 
-	public void setDbNamePrifix(String dbNamePrifix) {
-		this.dbNamePrifix = dbNamePrifix;
+	public void setSplitStrategyType(String splitStrategyType) {
+		this.splitStrategyType = SplitStrategyType.valueOf(splitStrategyType);
 	}
 
-	public String getTableNamePrifix() {
-		return tableNamePrifix;
+	public String getDbNamePrefix() {
+		return dbNamePrefix;
 	}
 
-	public void setTableNamePrifix(String tableNamePrifix) {
-		this.tableNamePrifix = tableNamePrifix;
+	public void setDbNamePrefix(String dbNamePrifix) {
+		this.dbNamePrefix = dbNamePrifix;
+	}
+
+	public String getTableNamePrefix() {
+		return tableNamePrefix;
+	}
+
+	public void setTableNamePrefix(String tableNamePrifix) {
+		this.tableNamePrefix = tableNamePrifix;
 	}
 
 	public int getDbNum() {
@@ -58,5 +72,13 @@ public class SplitTable {
 
 	public void setSplitStrategy(SplitStrategy splitStrategy) {
 		this.splitStrategy = splitStrategy;
+	}
+
+	public boolean isReadWriteSeparate() {
+		return readWriteSeparate;
+	}
+
+	public void setReadWriteSeparate(boolean readWriteSeparate) {
+		this.readWriteSeparate = readWriteSeparate;
 	}
 }
