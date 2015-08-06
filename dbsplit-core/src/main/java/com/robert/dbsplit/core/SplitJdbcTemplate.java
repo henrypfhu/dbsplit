@@ -25,13 +25,13 @@ import org.springframework.jdbc.support.rowset.SqlRowSet;
 import com.alibaba.druid.sql.parser.Lexer;
 import com.alibaba.druid.sql.parser.Token;
 
-public class AbstractSplitTemplate implements SplitJdbcOperations {
+public class SplitJdbcTemplate implements SplitJdbcOperations {
 	protected SplitStrategy dbSplitStrategy;
 	protected List<SplitNode> dbNodes;
 	protected List<SplitTable> dbCells;
 	protected boolean readWriteSeparate = true;
 
-	public AbstractSplitTemplate(SplitStrategy dbSplitStrategy,
+	public SplitJdbcTemplate(SplitStrategy dbSplitStrategy,
 			List<SplitNode> dbNodes, List<SplitTable> dbCells,
 			boolean readWriteSeparate) {
 		this.dbSplitStrategy = dbSplitStrategy;
@@ -247,44 +247,19 @@ public class AbstractSplitTemplate implements SplitJdbcOperations {
 			Class<T> requiredType) throws DataAccessException {
 		int dbNo = this.dbSplitStrategy.getDbNo(splitKey);
 		int tableNo = this.dbSplitStrategy.getTableNo(splitKey);
-		sql = splitTable(sql, dbNo, tableNo);
+		sql = SqlUtils.splitSelectSql(sql, dbNo, tableNo);
 
 		int nodeNo = this.dbSplitStrategy.getNodeNo(splitKey);
 		SplitNode sn = this.dbNodes.get(nodeNo);
-		JdbcTemplate jt = sn.getRandomSlaveTempate();
+		
+		JdbcTemplate jt = null;
+		
+		if (this.readWriteSeparate)
+			jt = sn.getRandomSlaveTempate();
+		else 
+			jt = sn.getMasterTemplate();
 
 		return jt.queryForObject(sql, args, requiredType);
-	}
-
-	protected String splitTable(String sql, int dbNo, int tableNo) {
-		Lexer lexer = new Lexer(sql);
-
-		String dbName = null;
-		String tableName = null;
-		boolean inProcess = false;
-
-		for (;;) {
-			lexer.nextToken();
-			Token tok = lexer.token();
-			if ("FROM".equals(tok.name))
-				inProcess = true;
-			else if ("WHERE".equals(tok.name))
-				inProcess = false;
-			if (inProcess) {
-				if (dbName == null && (tok == Token.IDENTIFIER))
-					dbName = lexer.stringVal();
-				else if (dbName != null && (tok == Token.IDENTIFIER))
-					tableName = lexer.stringVal();
-			}
-			if (tok == Token.EOF) {
-				break;
-			}
-		}
-
-		sql = sql.replace(dbName, dbName + "_" + dbNo);
-		sql = sql.replace(tableName, tableName + "_" + tableNo);
-
-		return sql;
 	}
 
 	public <T, K> T queryForObject(K splitKey, String sql,
@@ -373,10 +348,22 @@ public class AbstractSplitTemplate implements SplitJdbcOperations {
 
 	public <K> int update(K splitKey, String sql, Object... args)
 			throws DataAccessException {
+		int dbNo = this.dbSplitStrategy.getDbNo(splitKey);
+		int tableNo = this.dbSplitStrategy.getTableNo(splitKey);
+		sql = SqlUtils.splitUpdateSql(sql, dbNo, tableNo);
+
 		int nodeNo = this.dbSplitStrategy.getNodeNo(splitKey);
 		SplitNode sn = this.dbNodes.get(nodeNo);
-		JdbcTemplate jt = sn.getRandomSlaveTempate();
+		
+		JdbcTemplate jt = null;
+		
+		if (this.readWriteSeparate)
+			jt = sn.getRandomSlaveTempate();
+		else 
+			jt = sn.getMasterTemplate();
+
 		return jt.update(sql, args);
+
 	}
 
 	public <K> int[] batchUpdate(K splitKey, String sql,

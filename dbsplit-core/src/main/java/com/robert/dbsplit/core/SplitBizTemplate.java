@@ -2,9 +2,9 @@ package com.robert.dbsplit.core;
 
 import java.util.List;
 
-public class SplitTemplate extends AbstractSplitTemplate implements
+public class SplitBizTemplate extends SplitJdbcTemplate implements
 		SplitBizOperations {
-	public SplitTemplate(SplitStrategy dbSplitStrategy,
+	public SplitBizTemplate(SplitStrategy dbSplitStrategy,
 			List<SplitNode> dbNodes, List<SplitTable> dbCells,
 			boolean readWriteSeparate) {
 		super(dbSplitStrategy, dbNodes, dbCells, readWriteSeparate);
