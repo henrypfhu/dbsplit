@@ -9,8 +9,8 @@ public class SplitTable {
 	private int dbNum;
 	private int tableNum;
 
-	private List<SplitNode> splitNode;
-	private HashSplitStrategy hashSplitStrategy;
+	private List<SplitNode> splitNodes;
+	private SplitStrategy splitStrategy;
 
 	public String getDbNamePrifix() {
 		return dbNamePrifix;
@@ -44,19 +44,19 @@ public class SplitTable {
 		this.tableNum = tableNum;
 	}
 
-	public List<SplitNode> getSplitNode() {
-		return splitNode;
+	public List<SplitNode> getSplitNodes() {
+		return splitNodes;
 	}
 
-	public void setSplitNode(List<SplitNode> splitNode) {
-		this.splitNode = splitNode;
+	public void setSplitNodes(List<SplitNode> splitNodes) {
+		this.splitNodes = splitNodes;
 	}
 
-	public HashSplitStrategy getHashSplitStrategy() {
-		return hashSplitStrategy;
+	public SplitStrategy getSplitStrategy() {
+		return splitStrategy;
 	}
 
-	public void setHashSplitStrategy(HashSplitStrategy hashSplitStrategy) {
-		this.hashSplitStrategy = hashSplitStrategy;
+	public void setSplitStrategy(SplitStrategy splitStrategy) {
+		this.splitStrategy = splitStrategy;
 	}
 }

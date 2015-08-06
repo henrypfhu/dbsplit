@@ -26,6 +26,10 @@ public class SplitJdbcTemplate implements SplitJdbcOperations {
 	protected SplitTablesHolder splitTablesHolder;
 	protected boolean readWriteSeparate = true;
 
+	public SplitJdbcTemplate() {
+		
+	}
+	
 	public SplitJdbcTemplate(SplitTablesHolder splitTablesHolder,
 			boolean readWriteSeparate) {
 		this.splitTablesHolder = splitTablesHolder;
@@ -244,8 +248,8 @@ public class SplitJdbcTemplate implements SplitJdbcOperations {
 		SplitTable splitTable = splitTablesHolder.searchSplitTable(dbName,
 				tableName);
 
-		SplitStrategy splitStrategy = splitTable.getHashSplitStrategy();
-		List<SplitNode> splitNdoes = splitTable.getSplitNode();
+		SplitStrategy splitStrategy = splitTable.getSplitStrategy();
+		List<SplitNode> splitNdoes = splitTable.getSplitNodes();
 
 		int dbNo = splitStrategy.getDbNo(splitKey);
 		int tableNo = splitStrategy.getTableNo(splitKey);
@@ -357,8 +361,8 @@ public class SplitJdbcTemplate implements SplitJdbcOperations {
 		SplitTable splitTable = splitTablesHolder.searchSplitTable(dbName,
 				tableName);
 
-		SplitStrategy splitStrategy = splitTable.getHashSplitStrategy();
-		List<SplitNode> splitNdoes = splitTable.getSplitNode();
+		SplitStrategy splitStrategy = splitTable.getSplitStrategy();
+		List<SplitNode> splitNdoes = splitTable.getSplitNodes();
 
 		int dbNo = splitStrategy.getDbNo(splitKey);
 		int tableNo = splitStrategy.getTableNo(splitKey);
@@ -417,5 +421,21 @@ public class SplitJdbcTemplate implements SplitJdbcOperations {
 			throws DataAccessException {
 		// TODO Auto-generated method stub
 		return null;
+	}
+
+	public SplitTablesHolder getSplitTablesHolder() {
+		return splitTablesHolder;
+	}
+
+	public void setSplitTablesHolder(SplitTablesHolder splitTablesHolder) {
+		this.splitTablesHolder = splitTablesHolder;
+	}
+
+	public boolean isReadWriteSeparate() {
+		return readWriteSeparate;
+	}
+
+	public void setReadWriteSeparate(boolean readWriteSeparate) {
+		this.readWriteSeparate = readWriteSeparate;
 	}
 }

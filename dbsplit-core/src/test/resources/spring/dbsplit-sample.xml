@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:dubbo="http://code.alibabatech.com/schema/dubbo"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+	http://code.alibabatech.com/schema/dubbo http://code.alibabatech.com/schema/dubbo/dubbo.xsd">
+
+	<bean name="splitBizTemplate" class="com.robert.dbsplit.core.SplitBizTemplate">
+		<property name="splitTablesHolder" ref="splitTablesHolder" />
+	</bean>
+
+	<bean name="splitTablesHolder" class="com.robert.dbsplit.core.SplitTablesHolder">
+		<property name="splitTables">
+			<list>
+				<bean name="splitTable1" class="com.robert.dbsplit.core.SplitTable">
+					<property name="dbNamePrifix" value="DbPrefix" />
+					<property name="tableNamePrifix" value="TablePrefix" />
+					
+					<property name="dbNum" value="4" />
+					<property name="tableNum" value="8" />
+
+					<property name="splitNodes">
+						<list>
+							<bean class="com.robert.dbsplit.core.splitNode">
+								<property name="masterTemplate" ref="masterTemplate" />
+								<property name="slaveTemplates">
+									<list>
+										<ref bean="slaveTemplate0"></ref>
+									</list>
+								</property>
+							</bean>
+						</list>
+					</property>
+					<property name="splitStrategy" ref="splitStrategy" />
+				</bean>
+			</list>
+		</property>
+	</bean>
+</beans>

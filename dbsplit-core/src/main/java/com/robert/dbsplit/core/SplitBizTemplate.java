@@ -2,6 +2,10 @@ package com.robert.dbsplit.core;
 
 public class SplitBizTemplate extends SplitJdbcTemplate implements
 		SplitBizOperations {
+	public SplitBizTemplate() {
+		
+	}
+	
 	public SplitBizTemplate(SplitTablesHolder splitTablesHolder,
 			boolean readWriteSeparate) {
 		super(splitTablesHolder, readWriteSeparate);
