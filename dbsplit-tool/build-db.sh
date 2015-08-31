@@ -1,6 +1,6 @@
 #!/bin/bash
 
-insts=localhost:3306
+insts=localhost:3306,localhost:3306
 
 db_prefix=test_db
 table_prefix=test_table
@@ -21,8 +21,8 @@ build_db() {
   db=$2
   db_no=$3
 
-  for ((j=0;j<$table_num;j++)); do
-    ((table_no=$table_num*$db_no+$j))
+  for ((k=0;k<$table_num;k++)); do
+    ((table_no=$table_num*$db_no+$k))
     
     #reg="s/\$index/$table_no/g"
     #echo $reg
@@ -44,25 +44,28 @@ build_inst() {
 
   inst_no=$2
 
-  #mysql -uroot -pyouarebest -e "create user '$user_name'@'%' identified by '$password'"
   
-  for ((i=0;i<$db_num;i++)); do
-    ((db_no=$db_num*$inst_no+$i)) 
+  mysql -uroot -pyouarebest -e "delete from mysql.user where user = '$user_name'; flush privileges"
+  #mysql -uroot -pyouarebest -e "create user '$user_name'@'localhost' identified by '$password'"
+    
+  for ((j=0;j<$db_num;j++)); do
+    ((db_no=$db_num*$inst_no+$j)) 
+    
+    mysql -uroot -pyouarebest -e "drop database if exists ${db_prefix}_${db_no}"
     mysql -uroot -pyouarebest -e "create database ${db_prefix}_${db_no}"
 
-    mysql -uroot -pyouarebest -e "grant all privileges on ${db_prefix}_${db_no}.* to '$user_name'@'%' identified by '$password'"
+    mysql -uroot -pyouarebest -e "grant all privileges on ${db_prefix}_${db_no}.* to '$user_name'@'localhost' identified by '$password'"
     mysql -uroot -pyouarebest -e "flush privileges"    
 
     build_db $inst ${db_prefix}_${db_no} $db_no
   done   
-
-echo $host$post
 }
 
 insts_arr=(${insts//,/ })  
 insts_num=${#insts_arr[@]} 
 
-for ((i=0;i<$insts_num;i++)); do 
+for ((i=0;i<$insts_num;i++)); do
+echo $i 
   build_inst ${insts_arr[$i]} $i
 done
 
