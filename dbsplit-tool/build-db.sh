@@ -33,7 +33,7 @@ build_db() {
     sql_command="sed 's/"'$index'"/$table_no/g' ./$table_sql_file | tr -t '\n' '\0'"
     sql=`eval "$sql_command"`
     
-    mysql -u$root_user_name -p$root_password -e "$sql" $db
+    mysql -u$root_user_name -p$root_password -e "$sql" $db > /dev/null
      
   done  
 }
