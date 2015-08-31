@@ -14,6 +14,10 @@ password=test_password
 root_user_name=root
 root_password=youarebest
 
+debug=FALSE
+
+conn_host=localhost
+
 build_db() {
   inst=$1
   inst_arr=(${inst//:/ })
@@ -23,17 +27,21 @@ build_db() {
 
   db=$2
   db_no=$3
+  
+  echo "info: building instance $inst db $db db no $db_no"
 
   for ((k=0;k<$table_num;k++)); do
     ((table_no=$table_num*$db_no+$k))
-    
-    #reg="s/\$index/$table_no/g"
-    #echo $reg
+
+	echo "info: building instance $inst db $db db no $db_no table $table_no"    
     
     sql_command="sed 's/"'$index'"/$table_no/g' ./$table_sql_file | tr -t '\n' '\0'"
-    sql=`eval "$sql_command"`
+    sql_create_table=`eval "$sql_command"`
     
-    mysql -u$root_user_name -p$root_password -e "$sql" $db > /dev/null
+    if [[ $debug = 'TRUE' ]]; then
+    	echo "Create Table SQL: $sql_create_table"
+    fi
+    mysql -u$root_user_name -p$root_password -e "$sql_create_table" $db 2> /dev/null
      
   done  
 }
@@ -46,25 +54,42 @@ build_inst() {
   port=${inst_arr[1]}
 
   inst_no=$2
-
   
-  mysql -u$root_user_name -p$root_password -e "delete from mysql.user where user = '$user_name'; flush privileges"
-  #mysql -u$root_user_name -p$root_password -e "create user '$user_name'@'localhost' identified by '$password'"
+  echo "info: building instance $inst no $inst_no"
+  
+  sql_delete_user="delete from mysql.user where user = '$user_name'; flush privileges"
+  
+  if [[ $debug = 'TRUE' ]]; then
+	echo "Delete User SQL: $sql_delete_user"
+  fi
+  mysql -u$root_user_name -p$root_password -e "$sql_delete_user" 2> /dev/null
+  
+  #mysql -u$root_user_name -p$root_password -e "create user '$user_name'@'$conn_host' identified by '$password'"
     
   for ((j=0;j<$db_num;j++)); do
     ((db_no=$db_num*$inst_no+$j)) 
     
-    mysql -u$root_user_name -p$root_password -e "drop database if exists ${db_prefix}_${db_no}"
-    mysql -u$root_user_name -p$root_password -e "create database ${db_prefix}_${db_no}"
+    create_database_sql="drop database if exists ${db_prefix}_${db_no};create database ${db_prefix}_${db_no}"
+    
+    if [[ $debug = 'TRUE' ]]; then
+	  echo "Create Database SQL: $create_database_sql"
+    fi    
+    mysql -u$root_user_name -p$root_password -e "$create_database_sql" 2> /dev/null
 
-    mysql -u$root_user_name -p$root_password -e "grant all privileges on ${db_prefix}_${db_no}.* to '$user_name'@'localhost' identified by '$password'"
-    mysql -u$root_user_name -p$root_password -e "flush privileges"    
+	assign_rights_sql="grant all privileges on ${db_prefix}_${db_no}.* to '$user_name'@'$conn_host' identified by '$password';flush privileges"
+    
+    if [[ $debug = 'TRUE' ]]; then
+	  echo "Assign Rights SQL: $assign_rights_sql"
+    fi    
+    mysql -u$root_user_name -p$root_password -e "assign_rights_sql" 2> /dev/null    
 
     build_db $inst ${db_prefix}_${db_no} $db_no
   done   
 }
 
 main() {
+    echo "properties: insts=$insts db_prefix=$db_prefix table_sql_file=$table_sql_file db_num=$db_num table_num=$table_num user_name=$user_name password=$password root_user_name=$root_user_name root_password=$root_password"
+
 	insts_arr=(${insts//,/ })  
 	insts_num=${#insts_arr[@]} 
 	
@@ -77,7 +102,7 @@ PrintUsage()
 {
 cat << EndOfUsageMessage
 
-	Usage: $0 -i [INSTANCE_STR] -m [DB_PREFIX] -n [TABLE_SQL_FILE] -x [DB_SPLIT_NUM] -y [TABLE_SPLIT_NUM] -a [USER] -b [PASSWORD] -c [ROOT_USER] -d [ROOT_PASSWORD]
+	Usage: $0 -i [INSTANCE_STR] -m [DB_PREFIX] -n [TABLE_SQL_FILE] -x [DB_SPLIT_NUM] -y [TABLE_SPLIT_NUM] -a [USER] -b [PASSWORD] -c [ROOT_USER] -d [ROOT_PASSWORD] -l [CONNECTION_HOST] -t 
 	
 	Descriptions:
 	-i : instances string.
@@ -89,8 +114,11 @@ cat << EndOfUsageMessage
 	-b : password for the user name to be created.
 	-c : root user.
 	-d : password for root user.
+	-l : for the connection host.
+	-t : debug sql output.
 	
-	Example: $0 -i "localhost:3306,localhost:3306" -m test_db -n table.sql -x 2 -y 2 -a test_user -b test_password -c root -d youarebest
+	Example1: $0 -i "localhost:3306,localhost:3306" -m test_db -n table.sql -x 2 -y 2 -a test_user -b test_password -c root -d youarebest -l localhost -t
+	Example2: $0 -i "localhost:3306,localhost:3306" -m test_db -n table.sql -x 2 -y 2 -a test_user -b test_password -c root -d youarebest -l localhost
 	
 EndOfUsageMessage
 }
@@ -108,7 +136,7 @@ then
 fi
 
 
-while getopts "i:m:n:x:y:a:b:c:d:" arg
+while getopts "i:m:n:x:y:a:b:c:d:l:t" arg
 do
         case $arg in
              i)
@@ -137,6 +165,12 @@ do
                 ;;
              d)
                 root_password=$OPTARG
+                ;;
+             l)
+                conn_host=$OPTARG
+                ;;
+             t)
+                debug=TRUE
                 ;;
              ?) 
             	echo "`InvalidCommandSyntaxExit`"
