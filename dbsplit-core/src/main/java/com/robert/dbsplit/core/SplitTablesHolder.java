@@ -10,16 +10,16 @@ public class SplitTablesHolder {
 	private HashMap<String, SplitTable> splitTablesMap;
 
 	public SplitTablesHolder() {
-		
+
 	}
-	
+
 	public SplitTablesHolder(List<SplitTable> splitTables) {
 		this.splitTables = splitTables;
 
-		initSplitTablesMap();
+		init();
 	}
 
-	public void initSplitTablesMap() {
+	public void init() {
 		splitTablesMap = new HashMap<String, SplitTable>();
 
 		for (int i = 0; i < splitTables.size(); i++) {

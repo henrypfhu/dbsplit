@@ -248,7 +248,7 @@ public class SplitJdbcTemplate implements SplitJdbcOperations {
 
 	public <T, K> T queryForObject(K splitKey, String sql, Object[] args,
 			Class<T> requiredType) throws DataAccessException {
-		String[] dbTableNames = SqlUtils.getDbTableNames(sql);
+		String[] dbTableNames = SqlUtils.getDbTableNamesSelect(sql);
 		String dbName = dbTableNames[0];
 		String tableName = dbTableNames[1];
 
@@ -361,7 +361,7 @@ public class SplitJdbcTemplate implements SplitJdbcOperations {
 
 	public <K> int update(K splitKey, String sql, Object... args)
 			throws DataAccessException {
-		String[] dbTableNames = SqlUtils.getDbTableNames(sql);
+		String[] dbTableNames = SqlUtils.getDbTableNamesUpdate(sql);
 		String dbName = dbTableNames[0];
 		String tableName = dbTableNames[1];
 

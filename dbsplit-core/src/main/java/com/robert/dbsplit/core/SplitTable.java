@@ -17,9 +17,11 @@ public class SplitTable {
 
 	public void init() {
 		if (splitStrategyType == SplitStrategyType.VERTICAL)
-			this.splitStrategy = new VerticalHashSplitStrategy();
+			this.splitStrategy = new VerticalHashSplitStrategy(
+					splitNodes.size(), dbNum, tableNum);
 		else if (splitStrategyType == SplitStrategyType.HORIZONTAL)
-			this.splitStrategy = new HorizontalHashSplitStrategy();
+			this.splitStrategy = new HorizontalHashSplitStrategy(
+					splitNodes.size(), dbNum, tableNum);
 	}
 
 	public void setSplitStrategyType(String splitStrategyType) {

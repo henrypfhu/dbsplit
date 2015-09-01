@@ -6,25 +6,27 @@
 	http://code.alibabatech.com/schema/dubbo http://code.alibabatech.com/schema/dubbo/dubbo.xsd">
 
 	<!-- SplitBizTemplate Entry -->
+
 	<bean name="splitBizTemplate" class="com.robert.dbsplit.core.SplitBizTemplate">
 		<property name="splitTablesHolder" ref="splitTablesHolder" />
 	</bean>
 
 	<!-- SplitTablesHolder -->
-	<bean name="splitTablesHolder" class="com.robert.dbsplit.core.SplitTablesHolder" init-method="initSplitTablesMap" >
+
+	<bean name="splitTablesHolder" class="com.robert.dbsplit.core.SplitTablesHolder"
+		init-method="init">
 		<property name="splitTables">
 			<list>
-				<ref bean="splitTable1" />
+				<ref bean="splitTable" />
 			</list>
 		</property>
 	</bean>
 
-
 	<!-- SplitTables -->
 
-	<bean name="splitTable1" class="com.robert.dbsplit.core.SplitTable"
+	<bean name="splitTable" class="com.robert.dbsplit.core.SplitTable"
 		init-method="init">
-		
+
 		<property name="dbNamePrefix" value="test_db" />
 		<property name="tableNamePrefix" value="test_table" />
 
@@ -40,9 +42,9 @@
 		</property>
 
 		<property name="readWriteSeparate" value="true" />
-		
+
 	</bean>
- 
+
 	<!-- SplitNodes -->
 
 	<bean name="splitNode1" class="com.robert.dbsplit.core.SplitNode">
@@ -131,53 +133,49 @@
 
 	<bean id="masterDatasource0" parent="baseDataSource">
 		<property name="jdbcUrl">
-			<value>jdbc:mysql://localhost:3306/?useUnicode=true&amp;characterEncoding=UTF-8&amp;autoReconnect=true
-			</value>
+			<value>jdbc:mysql://localhost:3306/?useUnicode=true&amp;characterEncoding=UTF-8&amp;autoReconnect=true</value>
 		</property>
 		<property name="user">
-			<value>test_user</value>
+			<value>testuser</value>
 		</property>
 		<property name="password">
-			<value>test_password</value>
+			<value>testpassword</value>
 		</property>
 	</bean>
 
 	<bean id="slaveDatasource00" parent="baseDataSource">
 		<property name="jdbcUrl">
-			<value>jdbc:mysql://localhost:3306/?useUnicode=true&amp;characterEncoding=UTF-8&amp;autoReconnect=true
-			</value>
+			<value>jdbc:mysql://localhost:3306/?useUnicode=true&amp;characterEncoding=UTF-8&amp;autoReconnect=true</value>
 		</property>
 		<property name="user">
-			<value>test_user</value>
+			<value>testuser</value>
 		</property>
 		<property name="password">
-			<value>test_password</value>
+			<value>testpassword</value>
 		</property>
 	</bean>
 
 	<bean id="masterDatasource1" parent="baseDataSource">
 		<property name="jdbcUrl">
-			<value>jdbc:mysql://localhost:3306/?useUnicode=true&amp;characterEncoding=UTF-8&amp;autoReconnect=true
-			</value>
+			<value>jdbc:mysql://localhost:3306/?useUnicode=true&amp;characterEncoding=UTF-8&amp;autoReconnect=true</value>
 		</property>
 		<property name="user">
-			<value>test_user</value>
+			<value>testuser</value>
 		</property>
 		<property name="password">
-			<value>test_password</value>
+			<value>testpassword</value>
 		</property>
 	</bean>
 
 	<bean id="slaveDatasource10" parent="baseDataSource">
 		<property name="jdbcUrl">
-			<value>jdbc:mysql://localhost:3306/?useUnicode=true&amp;characterEncoding=UTF-8&amp;autoReconnect=true
-			</value>
+			<value>jdbc:mysql://localhost:3306/?useUnicode=true&amp;characterEncoding=UTF-8&amp;autoReconnect=true</value>
 		</property>
 		<property name="user">
-			<value>test_user</value>
+			<value>testuser</value>
 		</property>
 		<property name="password">
-			<value>test_password</value>
+			<value>testpassword</value>
 		</property>
 	</bean>
 </beans>

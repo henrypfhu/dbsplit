@@ -64,7 +64,7 @@ build_inst() {
   fi
   mysql -u$root_user_name -p$root_password -e "$sql_delete_user" 2> /dev/null
   
-  #mysql -u$root_user_name -p$root_password -e "create user '$user_name'@'$conn_host' identified by '$password'"
+  mysql -u$root_user_name -p$root_password -e "create user '$user_name'@'$conn_host' identified by '$password'"
     
   for ((j=0;j<$db_num;j++)); do
     ((db_no=$db_num*$inst_no+$j)) 
