@@ -33,7 +33,7 @@
 		<property name="dbNum" value="4" />
 		<property name="tableNum" value="4" />
 
-		<property name="splitStrategyType" value="VERTICAL" />
+		<property name="splitStrategyType" value="HORIZONTAL" />
 		<property name="splitNodes">
 			<list>
 				<ref bean="splitNode1" />

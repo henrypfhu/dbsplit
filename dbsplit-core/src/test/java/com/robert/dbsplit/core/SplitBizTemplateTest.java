@@ -16,7 +16,7 @@ public class SplitBizTemplateTest {
 		 * TestTable.class);
 		 */
 
-		int r = splitBizTemplate.update(0,
+		int r = splitBizTemplate.update(10,
 				"update test_db.test_table set name = ? where id = ?",
 				new Object[] { "test", 1 });
 
