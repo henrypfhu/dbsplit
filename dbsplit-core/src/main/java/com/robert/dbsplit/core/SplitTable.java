@@ -9,7 +9,7 @@ public class SplitTable {
 	private int dbNum;
 	private int tableNum;
 
-	private SplitStrategyType splitStrategyType;
+	private SplitStrategyType splitStrategyType = SplitStrategyType.VERTICAL;
 	private SplitStrategy splitStrategy;
 	private List<SplitNode> splitNodes;
 

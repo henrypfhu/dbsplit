@@ -11,38 +11,41 @@
 	</bean>
 
 	<!-- SplitTablesHolder -->
-	<bean name="splitTablesHolder" class="com.robert.dbsplit.core.SplitTablesHolder">
+	<bean name="splitTablesHolder" class="com.robert.dbsplit.core.SplitTablesHolder" init-method="initSplitTablesMap" >
 		<property name="splitTables">
 			<list>
-				<bean name="splitTable1" />
+				<ref bean="splitTable1" />
 			</list>
 		</property>
 	</bean>
+
 
 	<!-- SplitTables -->
 
 	<bean name="splitTable1" class="com.robert.dbsplit.core.SplitTable"
 		init-method="init">
-		<property name="dbNamePrifix" value="DbPrefix" />
-		<property name="tableNamePrifix" value="TablePrefix" />
+		
+		<property name="dbNamePrefix" value="test_db" />
+		<property name="tableNamePrefix" value="test_table" />
 
 		<property name="dbNum" value="4" />
-		<property name="tableNum" value="8" />
+		<property name="tableNum" value="4" />
 
-		<property name="splitStrategy" value="vertical" />
+		<property name="splitStrategyType" value="VERTICAL" />
 		<property name="splitNodes">
 			<list>
-				<bean name="splitNode1" />
-				<bean name="splitNode2" />
+				<ref bean="splitNode1" />
+				<ref bean="splitNode2" />
 			</list>
 		</property>
 
 		<property name="readWriteSeparate" value="true" />
+		
 	</bean>
-
+ 
 	<!-- SplitNodes -->
 
-	<bean name="splitNode1" class="com.robert.dbsplit.core.splitNode">
+	<bean name="splitNode1" class="com.robert.dbsplit.core.SplitNode">
 		<property name="masterTemplate" ref="masterTemplate0" />
 		<property name="slaveTemplates">
 			<list>
@@ -51,7 +54,7 @@
 		</property>
 	</bean>
 
-	<bean name="splitNode2" class="com.robert.dbsplit.core.splitNode">
+	<bean name="splitNode2" class="com.robert.dbsplit.core.SplitNode">
 		<property name="masterTemplate" ref="masterTemplate1" />
 		<property name="slaveTemplates">
 			<list>
@@ -74,7 +77,7 @@
 		abstract="false" lazy-init="false" autowire="default"
 		dependency-check="default">
 		<property name="dataSource">
-			<ref bean="masterDatasource00" />
+			<ref bean="slaveDatasource00" />
 		</property>
 	</bean>
 
@@ -90,7 +93,7 @@
 		abstract="false" lazy-init="false" autowire="default"
 		dependency-check="default">
 		<property name="dataSource">
-			<ref bean="masterDatasource10" />
+			<ref bean="slaveDatasource10" />
 		</property>
 	</bean>
 
@@ -128,53 +131,53 @@
 
 	<bean id="masterDatasource0" parent="baseDataSource">
 		<property name="jdbcUrl">
-			<value>jdbc:mysql://testdb1:4549/?useUnicode=true&amp;characterEncoding=UTF-8&amp;autoReconnect=true
+			<value>jdbc:mysql://localhost:3306/?useUnicode=true&amp;characterEncoding=UTF-8&amp;autoReconnect=true
 			</value>
 		</property>
 		<property name="user">
-			<value>test</value>
+			<value>test_user</value>
 		</property>
 		<property name="password">
-			<value>testpwd</value>
+			<value>test_password</value>
 		</property>
 	</bean>
 
 	<bean id="slaveDatasource00" parent="baseDataSource">
 		<property name="jdbcUrl">
-			<value>jdbc:mysql://testdb1:4549/?useUnicode=true&amp;characterEncoding=UTF-8&amp;autoReconnect=true
+			<value>jdbc:mysql://localhost:3306/?useUnicode=true&amp;characterEncoding=UTF-8&amp;autoReconnect=true
 			</value>
 		</property>
 		<property name="user">
-			<value>test</value>
+			<value>test_user</value>
 		</property>
 		<property name="password">
-			<value>testpwd</value>
+			<value>test_password</value>
 		</property>
 	</bean>
 
 	<bean id="masterDatasource1" parent="baseDataSource">
 		<property name="jdbcUrl">
-			<value>jdbc:mysql://testdb1:4549/?useUnicode=true&amp;characterEncoding=UTF-8&amp;autoReconnect=true
+			<value>jdbc:mysql://localhost:3306/?useUnicode=true&amp;characterEncoding=UTF-8&amp;autoReconnect=true
 			</value>
 		</property>
 		<property name="user">
-			<value>test</value>
+			<value>test_user</value>
 		</property>
 		<property name="password">
-			<value>testpwd</value>
+			<value>test_password</value>
 		</property>
 	</bean>
 
 	<bean id="slaveDatasource10" parent="baseDataSource">
 		<property name="jdbcUrl">
-			<value>jdbc:mysql://testdb1:4549/?useUnicode=true&amp;characterEncoding=UTF-8&amp;autoReconnect=true
+			<value>jdbc:mysql://localhost:3306/?useUnicode=true&amp;characterEncoding=UTF-8&amp;autoReconnect=true
 			</value>
 		</property>
 		<property name="user">
-			<value>test</value>
+			<value>test_user</value>
 		</property>
 		<property name="password">
-			<value>testpwd</value>
+			<value>test_password</value>
 		</property>
 	</bean>
 </beans>
