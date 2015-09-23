@@ -8,4 +8,6 @@ public interface SimpleJdbcOperations {
 	public <T> void delete(long id, Class<T> clazz);
 
 	public <T> T get(long id, final Class<T> clazz);
+
+	public <T> T get(String key, String value, final Class<T> clazz);
 }

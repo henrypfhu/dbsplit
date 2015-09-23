@@ -38,6 +38,9 @@ public class SimpleJdbcTemplate extends JdbcTemplate implements
 					sb.append(",");
 
 				sb.append(OrmUtil.javaFieldName2DbFieldName(field.getName()));
+				
+				if (value instanceof Enum ) 
+					value = ((Enum<?>)value).ordinal();
 
 				params.add(value);
 			}
@@ -72,6 +75,9 @@ public class SimpleJdbcTemplate extends JdbcTemplate implements
 
 				sb.append(OrmUtil.javaFieldName2DbFieldName(field.getName()))
 						.append("=? ");
+				
+				if (value instanceof Enum ) 
+					value = ((Enum<?>)value).ordinal();
 
 				params.add(value);
 			}

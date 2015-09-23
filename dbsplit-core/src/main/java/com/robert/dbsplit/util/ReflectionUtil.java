@@ -98,4 +98,20 @@ public abstract class ReflectionUtil {
 
 		return result;
 	}
+
+	public static Method searchEnumSetter(Class<?> clazz, String methodName) {
+		Method[] methods = clazz.getMethods();
+
+		for (Method method : methods) {
+			if (method.getName().equals(methodName)) {
+				if (method.getParameterCount() > 0) {
+					Class<?> paramType = method.getParameterTypes()[0];
+					if (Enum.class.isAssignableFrom(paramType))
+						return method;
+				}
+			}
+		}
+
+		return null;
+	}
 }

@@ -79,7 +79,7 @@ public abstract class OrmUtil {
 			T bean = clazz.newInstance();
 
 			ResultSetMetaData rsmd = (ResultSetMetaData) rs.getMetaData();
-			for (int i = 0; i < rsmd.getColumnCount(); i++) {
+			for (int i = 1; i <= rsmd.getColumnCount(); i++) {
 				int columnType = rsmd.getColumnType(i);
 				String columnName = rsmd.getColumnName(i);
 				String fieldName = OrmUtil
@@ -88,11 +88,14 @@ public abstract class OrmUtil {
 						.fieldName2SetterName(fieldName);
 
 				if (columnType == Types.SMALLINT) {
-					Method setter = clazz.getMethod(setterName, Enum.class);
-					Class<?> enumParamClazz = setter.getParameterTypes()[0]; 
-					Method enumParseFactoryMethod = enumParamClazz.getMethod("parse", int.class);
-					Object value = enumParseFactoryMethod.invoke(enumParamClazz, rs.getInt(i));
-					
+					Method setter = ReflectionUtil.searchEnumSetter(clazz,
+							setterName);
+					Class<?> enumParamClazz = setter.getParameterTypes()[0];
+					Method enumParseFactoryMethod = enumParamClazz.getMethod(
+							"parse", int.class);
+					Object value = enumParseFactoryMethod.invoke(
+							enumParamClazz, rs.getInt(i));
+
 					setter.invoke(bean, value);
 				} else {
 					Class<? extends Object> param = null;
@@ -103,14 +106,18 @@ public abstract class OrmUtil {
 						value = rs.getString(i);
 						break;
 					case Types.BIGINT:
-						param = Long.class;
+						param = long.class;
 						value = rs.getLong(i);
 						break;
 					case Types.INTEGER:
-						param = Integer.class;
+						param = int.class;
 						value = rs.getInt(i);
 						break;
 					case Types.DATE:
+						param = Date.class;
+						value = rs.getDate(i);
+						break;
+					case Types.TIMESTAMP:
 						param = Date.class;
 						value = rs.getDate(i);
 						break;
@@ -133,22 +140,5 @@ public abstract class OrmUtil {
 			throw new IllegalStateException(
 					"Fail to operator on ResultSet metadata.", e);
 		}
-
-		/*
-		 * account.setId(rs.getLong("ID"));
-		 * account.setClientId(rs.getString("CLIENT_ID"));
-		 * account.setClientDesc(rs.getString("CLIENT_DESC"));
-		 * account.setBillingPeriod(Account.BillingPeriod
-		 * .valueOf(rs.getString("BILLING_PERIOD")));
-		 * account.setDefInvInfoId(rs.getLong("DEF_INV_INFO_ID"));
-		 * account.setAccumInvAmount(rs .getLong("ACCUM_INV_AMOUNT"));
-		 * account.setCapableInvAmount(rs .getLong("CAPABLE_INV_AMOUNT"));
-		 * account.setBalance(rs.getLong("BALANCE"));
-		 * account.setStatus(Account.Status.parse(rs .getInt("STATUS")));
-		 * account.setCompLock(Account.CompLock.parse(rs .getInt("COMP_LOCK")));
-		 * account.setLstUpdUser(rs.getString("LST_UPD_USER"));
-		 * account.setLstUpdTime(rs.getDate("LST_UPD_TIME")); return account;
-		 */
-
 	}
 }
