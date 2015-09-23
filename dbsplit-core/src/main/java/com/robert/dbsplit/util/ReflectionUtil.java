@@ -24,7 +24,7 @@ public abstract class ReflectionUtil {
 					try {
 						Method method = clazz
 								.getMethod(fieldName2GetterName(field.getName()));
-						
+
 						if (method.getReturnType() != field.getType()) {
 							log.error(
 									"The getter for field {} may not be correct.",
@@ -57,5 +57,41 @@ public abstract class ReflectionUtil {
 
 	public static String fieldName2GetterName(String fieldName) {
 		return "get" + StringUtils.capitalize(fieldName);
+	}
+
+	public static <T> Object getFieldValue(T bean, String fieldName) {
+		Field field = null;
+		try {
+			field = bean.getClass().getDeclaredField(fieldName);
+		} catch (NoSuchFieldException e) {
+			log.error("Fail to obtain field {} from bean {}.", fieldName, bean);
+			log.error("Exception--->", e);
+			throw new IllegalStateException("Refelction error: ", e);
+		} catch (SecurityException e) {
+			log.error("Fail to obtain field {} from bean {}.", fieldName, bean);
+			log.error("Exception--->", e);
+			throw new IllegalStateException("Refelction error: ", e);
+		}
+
+		boolean access = field.isAccessible();
+		field.setAccessible(true);
+
+		Object result = null;
+		try {
+			result = field.get(bean);
+		} catch (IllegalArgumentException e) {
+			log.error("Fail to obtain field {}'s value from bean {}.",
+					fieldName, bean);
+			log.error("Exception--->", e);
+			throw new IllegalStateException("Refelction error: ", e);
+		} catch (IllegalAccessException e) {
+			log.error("Fail to obtain field {}'s value from bean {}.",
+					fieldName, bean);
+			log.error("Exception--->", e);
+			throw new IllegalStateException("Refelction error: ", e);
+		}
+		field.setAccessible(access);
+
+		return result;
 	}
 }
