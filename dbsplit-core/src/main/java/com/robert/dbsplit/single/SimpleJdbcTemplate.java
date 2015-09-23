@@ -1,12 +1,15 @@
 package com.robert.dbsplit.single;
 
 import java.lang.reflect.Field;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.LinkedList;
 import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.RowMapper;
 
 import com.robert.dbsplit.util.FieldHandler;
 import com.robert.dbsplit.util.FieldVisitor;
@@ -86,14 +89,49 @@ public class SimpleJdbcTemplate extends JdbcTemplate implements
 		this.update(sb.toString(), params.toArray());
 	}
 
-	public void delete(long id) {
-		// TODO Auto-generated method stub
+	public <T> void delete(long id, Class<T> clazz) {
+		StringBuilder sb = new StringBuilder();
+		sb.append("delete from ");
+		sb.append(OrmUtil.javaClassName2DbTableName(clazz.getSimpleName()))
+				.append(" ");
+		sb.append("where ID = ?");
 
+		this.update(sb.toString(), id);
 	}
 
-	public <T> T get(long id) {
-		// TODO Auto-generated method stub
-		return null;
+	public <T> T get(long id, final Class<T> clazz) {
+		StringBuilder sb = new StringBuilder();
+		sb.append("select * from ");
+		sb.append(OrmUtil.javaClassName2DbTableName(clazz.getSimpleName()))
+				.append(" ");
+		sb.append("where ID = ?");
+
+		T bean = this.queryForObject(sb.toString(), new Object[] { id },
+				new RowMapper<T>() {
+					public T mapRow(ResultSet rs, int rowNum)
+							throws SQLException {
+						return OrmUtil.convertRow2Bean(rs, clazz);
+					}
+				});
+		return bean;
+	}
+
+	public <T> T get(String key, String value, final Class<T> clazz) {
+		StringBuilder sb = new StringBuilder();
+		sb.append("select * from ");
+		sb.append(OrmUtil.javaClassName2DbTableName(clazz.getSimpleName()))
+				.append(" ");
+		sb.append("where ");
+		sb.append(key).append("=?");
+
+		T bean = this.queryForObject(sb.toString(), new Object[] { value },
+				new RowMapper<T>() {
+					public T mapRow(ResultSet rs, int rowNum)
+							throws SQLException {
+						return OrmUtil.convertRow2Bean(rs, clazz);
+					}
+				});
+		return bean;
 	}
 
 }

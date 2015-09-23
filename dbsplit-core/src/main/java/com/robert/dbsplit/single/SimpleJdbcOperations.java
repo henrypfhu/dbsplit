@@ -5,7 +5,7 @@ public interface SimpleJdbcOperations {
 
 	public <T> void update(T bean);
 
-	public void delete(long id);
+	public <T> void delete(long id, Class<T> clazz);
 
-	public <T> T get(long id);
+	public <T> T get(long id, final Class<T> clazz);
 }

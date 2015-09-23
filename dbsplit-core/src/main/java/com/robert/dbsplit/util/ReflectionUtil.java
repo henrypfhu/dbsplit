@@ -59,6 +59,10 @@ public abstract class ReflectionUtil {
 		return "get" + StringUtils.capitalize(fieldName);
 	}
 
+	public static String fieldName2SetterName(String fieldName) {
+		return "set" + StringUtils.capitalize(fieldName);
+	}
+
 	public static <T> Object getFieldValue(T bean, String fieldName) {
 		Field field = null;
 		try {
