@@ -47,7 +47,7 @@ main() {
 
   for ((j=0;j<$conn_hosts_num;j++)); do
     if [[ $debug = 'TRUE' ]]; then
-      echo "4.$j. Create user for host: ${conn_hosts_arr[j]}"
+      echo "4.$j. Create user for host: ${conn_hosts_arr[j]} by SQL: create user '$user_name'@'${conn_hosts_arr[j]}' identified by '$password';"
     fi
     
 
@@ -58,7 +58,7 @@ main() {
     if [[ $debug = 'TRUE' ]]; then
       echo "5.$j. Assign Rights SQL: $assign_rights_sql"
     fi
-    mysql -h $host -P $port -u$root_user_name -p$root_password -e "assign_rights_sql" 2> /dev/null    
+    mysql -h $host -P $port -u$root_user_name -p$root_password -e "$assign_rights_sql" 2> /dev/null    
   done   
 }
 
