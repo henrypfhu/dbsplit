@@ -35,7 +35,7 @@ build_db() {
 
 	echo "info: building instance $inst db $db db no $db_no table $table_no"    
     
-    sql_command="sed 's/"'$I'"/$table_no/g' $table_sql_file | tr -t '\n' '\0'"
+    sql_command="sed 's/"'$I'"/$table_no/g' $table_sql_file | tr -t '\n' ' '"
     sql_create_table=`eval "$sql_command"`
     
     if [[ $debug = 'TRUE' ]]; then
