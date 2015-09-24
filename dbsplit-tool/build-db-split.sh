@@ -35,13 +35,13 @@ build_db() {
 
 	echo "info: building instance $inst db $db db no $db_no table $table_no"    
     
-    sql_command="sed 's/"'$I'"/$table_no/g' $table_sql_file | tr -t '\n' ' '"
+    sql_command="sed 's/"'$I'"/$table_no/g' $table_sql_file | tr -t '\n' '\n'"
     sql_create_table=`eval "$sql_command"`
     
     if [[ $debug = 'TRUE' ]]; then
     	echo "Create Table SQL: $sql_create_table"
     fi
-    mysql -h$host -P$port -u$root_user_name -p$root_password -e "$sql_create_table" $db 2> /dev/null
+    mysql -h$host -P$port -u$root_user_name -p$root_password -e "$sql_create_table" $db #2> /dev/null
      
   done  
 }
