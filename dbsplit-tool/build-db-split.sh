@@ -33,7 +33,7 @@ build_db() {
   for ((k=0;k<$table_num;k++)); do
     ((table_no=$table_num*$db_no+$k))
 
-	echo "info: building instance $inst db $db db no $db_no table $table_no"    
+    echo "info: building instance $inst db $db db no $db_no table $table_no"    
     
     sql_command="sed 's/"'$I'"/$table_no/g' $table_sql_file | tr -t '\n' '\n'"
     sql_create_table=`eval "$sql_command"`
@@ -64,6 +64,9 @@ build_inst() {
   fi
   mysql -h$host -P$port -u$root_user_name -p$root_password -e "$sql_delete_user" 2> /dev/null
   
+  if [[ $debug = 'TRUE' ]]; then
+	echo "Create User SQL: create user '$user_name'@'$conn_host' identified by '$password'"
+  fi
   mysql -h$host -P$port -u$root_user_name -p$root_password -e "create user '$user_name'@'$conn_host' identified by '$password'"
     
   for ((j=0;j<$db_num;j++)); do
@@ -81,7 +84,7 @@ build_inst() {
     if [[ $debug = 'TRUE' ]]; then
 	  echo "Assign Rights SQL: $assign_rights_sql"
     fi    
-    mysql -h$host -P$port -u$root_user_name -p$root_password -e "assign_rights_sql" 2> /dev/null    
+    mysql -h$host -P$port -u$root_user_name -p$root_password -e "$assign_rights_sql" 2> /dev/null    
 
     build_db $inst ${db_prefix}_${db_no} $db_no
   done   
