@@ -3,7 +3,7 @@ package com.robert.dbsplit.core;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
-public class SplitBizTemplateTest {
+public class SimpleSplitJdbcTemplateTest {
 	public static void main(String[] args) throws Exception {
 		ApplicationContext ac = new ClassPathXmlApplicationContext(
 				"spring/dbsplit-sample.xml");
