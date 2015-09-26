@@ -7,8 +7,8 @@ public class SplitBizTemplateTest {
 	public static void main(String[] args) throws Exception {
 		ApplicationContext ac = new ClassPathXmlApplicationContext(
 				"spring/dbsplit-sample.xml");
-		SplitBizTemplate splitBizTemplate = (SplitBizTemplate) ac
-				.getBean("splitBizTemplate");
+		SimpleSplitJdbcTemplate simpleSplitJdbcTemplate = (SimpleSplitJdbcTemplate) ac
+				.getBean("simpleSplitJdbcTemplate");
 
 		/*
 		 * TestTable tt = splitBizTemplate.queryForObject(0,
@@ -16,7 +16,7 @@ public class SplitBizTemplateTest {
 		 * TestTable.class);
 		 */
 
-		int r = splitBizTemplate.update(10,
+		int r = simpleSplitJdbcTemplate.update(10,
 				"update test_db.test_table set name = ? where id = ?",
 				new Object[] { "test", 1 });
 

@@ -9,6 +9,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.mysql.jdbc.ResultSetMetaData;
+import com.robert.dbsplit.util.reflect.ReflectionUtil;
 
 public abstract class OrmUtil {
 	private static final Logger log = LoggerFactory.getLogger(OrmUtil.class);

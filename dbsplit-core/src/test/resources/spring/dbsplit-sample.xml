@@ -7,7 +7,7 @@
 
 	<!-- SplitBizTemplate Entry -->
 
-	<bean name="splitBizTemplate" class="com.robert.dbsplit.core.SplitBizTemplate">
+	<bean name="simpleSplitJdbcTemplate" class="com.robert.dbsplit.core.SimpleSplitJdbcTemplate">
 		<property name="splitTablesHolder" ref="splitTablesHolder" />
 	</bean>
 

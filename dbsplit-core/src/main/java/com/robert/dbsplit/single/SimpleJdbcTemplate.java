@@ -11,10 +11,12 @@ import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 
-import com.robert.dbsplit.util.FieldHandler;
-import com.robert.dbsplit.util.FieldVisitor;
 import com.robert.dbsplit.util.OrmUtil;
-import com.robert.dbsplit.util.ReflectionUtil;
+import com.robert.dbsplit.util.SqlUtil;
+import com.robert.dbsplit.util.SqlUtil.SqlRunningBean;
+import com.robert.dbsplit.util.reflect.FieldHandler;
+import com.robert.dbsplit.util.reflect.FieldVisitor;
+import com.robert.dbsplit.util.reflect.ReflectionUtil;
 
 public class SimpleJdbcTemplate extends JdbcTemplate implements
 		SimpleJdbcOperations {
@@ -23,39 +25,14 @@ public class SimpleJdbcTemplate extends JdbcTemplate implements
 			.getLogger(SimpleJdbcTemplate.class);
 
 	public <T> void insert(T bean) {
-		final StringBuilder sb = new StringBuilder();
-		sb.append("insert into ");
-		sb.append(
-				OrmUtil.javaClassName2DbTableName(bean.getClass()
-						.getSimpleName())).append(" ");
-		sb.append("(");
-
-		final List<Object> params = new LinkedList<Object>();
-
-		new FieldVisitor(bean).visit(new FieldHandler() {
-			public void handle(int index, Field field, Object value) {
-				if (index != 0)
-					sb.append(",");
-
-				sb.append(OrmUtil.javaFieldName2DbFieldName(field.getName()));
-				
-				if (value instanceof Enum ) 
-					value = ((Enum<?>)value).ordinal();
-
-				params.add(value);
-			}
-		});
-
-		sb.append(") values (");
-		sb.append(OrmUtil.generateParamPlaceholders(params.size()));
-		sb.append(")");
+		SqlRunningBean srb = SqlUtil.generateInsertSql(bean);
 
 		log.debug("The bean class: {} ---> the SQL: {}", bean.getClass()
-				.getName(), sb.toString());
+				.getName(), srb.getSql());
 
-		log.debug("The bean: {} ---> the params: {}", bean, params);
+		log.debug("The bean: {} ---> the params: {}", bean, srb.getParams());
 
-		this.update(sb.toString(), params.toArray());
+		this.update(srb.getSql(), srb.getParams());
 	}
 
 	public <T> void update(T bean) {
@@ -68,16 +45,16 @@ public class SimpleJdbcTemplate extends JdbcTemplate implements
 
 		final List<Object> params = new LinkedList<Object>();
 
-		new FieldVisitor(bean).visit(new FieldHandler() {
+		new FieldVisitor<T>(bean).visit(new FieldHandler() {
 			public void handle(int index, Field field, Object value) {
 				if (index != 0)
 					sb.append(", ");
 
 				sb.append(OrmUtil.javaFieldName2DbFieldName(field.getName()))
 						.append("=? ");
-				
-				if (value instanceof Enum ) 
-					value = ((Enum<?>)value).ordinal();
+
+				if (value instanceof Enum)
+					value = ((Enum<?>) value).ordinal();
 
 				params.add(value);
 			}

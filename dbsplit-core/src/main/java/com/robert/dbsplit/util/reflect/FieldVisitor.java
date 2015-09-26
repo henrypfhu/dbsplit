@@ -1,4 +1,4 @@
-package com.robert.dbsplit.util;
+package com.robert.dbsplit.util.reflect;
 
 import java.lang.reflect.Field;
 import java.util.List;
