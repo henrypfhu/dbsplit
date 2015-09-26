@@ -7,6 +7,8 @@ public class SplitTablesHolder {
 	private static final String DB_TABLE_SEP = "$";
 	private List<SplitTable> splitTables;
 
+	private HashMap<String, SplitTable> splitTablesMapFull;
+
 	private HashMap<String, SplitTable> splitTablesMap;
 
 	public SplitTablesHolder() {
@@ -20,6 +22,7 @@ public class SplitTablesHolder {
 	}
 
 	public void init() {
+		splitTablesMapFull = new HashMap<String, SplitTable>();
 		splitTablesMap = new HashMap<String, SplitTable>();
 
 		for (int i = 0; i < splitTables.size(); i++) {
@@ -27,7 +30,9 @@ public class SplitTablesHolder {
 
 			String key = constructKey(st.getDbNamePrefix(),
 					st.getTableNamePrefix());
-			splitTablesMap.put(key, st);
+			splitTablesMapFull.put(key, st);
+
+			splitTablesMap.put(st.getTableNamePrefix(), st);
 		}
 	}
 
@@ -36,7 +41,11 @@ public class SplitTablesHolder {
 	}
 
 	public SplitTable searchSplitTable(String dbName, String tableName) {
-		return splitTablesMap.get(constructKey(dbName, tableName));
+		return splitTablesMapFull.get(constructKey(dbName, tableName));
+	}
+
+	public SplitTable searchSplitTable(String tableName) {
+		return splitTablesMap.get(tableName);
 	}
 
 	public List<SplitTable> getSplitTables() {

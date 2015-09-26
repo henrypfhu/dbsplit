@@ -16,13 +16,11 @@ public class HorizontalHashSplitStrategy implements SplitStrategy {
 	}
 
 	public int getNodeNo(Object splitKey) {
-		int hashCode = calcHashCode(splitKey);
-		return hashCode % portNum;
+		return getTableNo(splitKey) / portNum;
 	}
 
 	public int getDbNo(Object splitKey) {
-		int hashCode = calcHashCode(splitKey);
-		return hashCode % (portNum * dbNum);
+		return getTableNo(splitKey) / dbNum;
 	}
 
 	public int getTableNo(Object splitKey) {
