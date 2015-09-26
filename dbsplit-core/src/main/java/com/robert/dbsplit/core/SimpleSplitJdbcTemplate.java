@@ -15,6 +15,10 @@ public class SimpleSplitJdbcTemplate extends SplitJdbcTemplate implements
 	private static final Logger log = LoggerFactory
 			.getLogger(SimpleSplitJdbcTemplate.class);
 
+	private enum UpdateOper {
+		INSERT, UPDATE, DELETE
+	};
+
 	public SimpleSplitJdbcTemplate() {
 
 	}
@@ -29,10 +33,34 @@ public class SimpleSplitJdbcTemplate extends SplitJdbcTemplate implements
 	}
 
 	public <K, T> void insert(K splitKey, T bean) {
-		log.debug("The split key: {}, the split bean: {}.", splitKey, bean);
+		doUpdate(splitKey, bean.getClass(), UpdateOper.INSERT, bean, -1);
+	}
+
+	public <K, T> void update(K splitKey, T bean) {
+		doUpdate(splitKey, bean.getClass(), UpdateOper.UPDATE, bean, -1);
+	}
+
+	public <K, T> void delete(K splitKey, long id, Class<T> clazz) {
+		doUpdate(splitKey, clazz, UpdateOper.DELETE, null, id);
+	}
+
+	public <K, T> T get(K splitKey, long id, final Class<T> clazz) {
+		return null;
+	}
+
+	public <K, T> T get(K splitKey, String key, String value,
+			final Class<T> clazz) {
+		return null;
+	}
+
+	protected <K, T> void doUpdate(K splitKey, Class<?> clazz,
+			UpdateOper updateOper, T bean, long id) {
+		log.debug(
+				"The split key: {}, the clazz: {}, the updateOper: {}, the split bean: {}, the ID: {}.",
+				splitKey, clazz, updateOper, bean, id);
 
 		SplitTable splitTable = splitTablesHolder.searchSplitTable(OrmUtil
-				.javaClassName2DbTableName(bean.getClass().getSimpleName()));
+				.javaClassName2DbTableName(clazz.getSimpleName()));
 
 		SplitStrategy splitStrategy = splitTable.getSplitStrategy();
 		List<SplitNode> splitNdoes = splitTable.getSplitNodes();
@@ -51,30 +79,25 @@ public class SimpleSplitJdbcTemplate extends SplitJdbcTemplate implements
 		SplitNode sn = splitNdoes.get(nodeNo);
 		JdbcTemplate jt = sn.getMasterTemplate();
 
-		SqlRunningBean srb = SqlUtil.generateInsertSql(bean, dbPrefix,
-				tablePrefix, dbNo, tableNo);
+		SqlRunningBean srb = null;
+		switch (updateOper) {
+		case INSERT:
+			srb = SqlUtil.generateInsertSql(bean, dbPrefix, tablePrefix, dbNo,
+					tableNo);
+			break;
+		case UPDATE:
+			srb = SqlUtil.generateUpdateSql(bean, dbPrefix, tablePrefix, dbNo,
+					tableNo);
+			break;
+		case DELETE:
+			srb = SqlUtil.generateDeleteSql(id, clazz, dbPrefix, tablePrefix,
+					dbNo, tableNo);
+			break;
+		}
 
 		log.debug("The split SQL: {}, the split params: {}.", srb.getSql(),
 				srb.getParams());
 		long updateCount = jt.update(srb.getSql(), srb.getParams());
 		log.info("Update record num: {}.", updateCount);
 	}
-
-	public <K, T> void update(K splitKey, T bean) {
-
-	}
-
-	public <K, T> void delete(K splitKey, long id, Class<T> clazz) {
-
-	}
-
-	public <K, T> T get(K splitKey, long id, final Class<T> clazz) {
-		return null;
-	}
-
-	public <K, T> T get(K splitKey, String key, String value,
-			final Class<T> clazz) {
-		return null;
-	}
-
 }
