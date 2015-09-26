@@ -95,7 +95,7 @@ public abstract class SqlUtil {
 			String databasePrefix, String tablePrefix, int databaseIndex,
 			int tableIndex) {
 		final StringBuilder sb = new StringBuilder();
-		sb.append("update ");
+		sb.append(" update ");
 
 		if (StringUtils.isEmpty(tablePrefix))
 			tablePrefix = OrmUtil.javaClassName2DbTableName(bean.getClass()
@@ -104,7 +104,7 @@ public abstract class SqlUtil {
 		sb.append(getQualifiedTableName(databasePrefix, tablePrefix,
 				databaseIndex, tableIndex));
 
-		sb.append("set ");
+		sb.append(" set ");
 
 		final List<Object> params = new LinkedList<Object>();
 
@@ -123,7 +123,7 @@ public abstract class SqlUtil {
 			}
 		});
 
-		sb.append("where ID = ?");
+		sb.append(" where ID = ?");
 
 		params.add(ReflectionUtil.getFieldValue(bean, "id"));
 
@@ -157,7 +157,7 @@ public abstract class SqlUtil {
 		sb.append(getQualifiedTableName(databasePrefix, tablePrefix,
 				databaseIndex, tableIndex));
 
-		sb.append("where ID = ?");
+		sb.append(" where ID = ?");
 
 		List<Object> params = new LinkedList<Object>();
 		params.add(id);
@@ -192,7 +192,7 @@ public abstract class SqlUtil {
 		sb.append(getQualifiedTableName(databasePrefix, tablePrefix,
 				databaseIndex, tableIndex));
 
-		sb.append("where ");
+		sb.append(" where ");
 		sb.append(name).append("=?");
 
 		List<Object> params = new LinkedList<Object>();

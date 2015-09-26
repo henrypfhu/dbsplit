@@ -16,7 +16,7 @@ public class HorizontalHashSplitStrategy implements SplitStrategy {
 	}
 
 	public int getNodeNo(Object splitKey) {
-		return getTableNo(splitKey) / portNum;
+		return getDbNo(splitKey) / portNum;
 	}
 
 	public int getDbNo(Object splitKey) {
