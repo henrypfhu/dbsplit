@@ -22,6 +22,8 @@ import org.springframework.jdbc.core.StatementCallback;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.jdbc.support.rowset.SqlRowSet;
 
+import com.robert.dbsplit.util.SqlUtil;
+
 public class SplitJdbcTemplate implements SplitJdbcOperations {
 	protected SplitTablesHolder splitTablesHolder;
 
@@ -248,7 +250,7 @@ public class SplitJdbcTemplate implements SplitJdbcOperations {
 
 	public <T, K> T queryForObject(K splitKey, String sql, Object[] args,
 			Class<T> requiredType) throws DataAccessException {
-		String[] dbTableNames = SqlUtils.getDbTableNamesSelect(sql);
+		String[] dbTableNames = SqlUtil.getDbTableNamesSelect(sql);
 		String dbName = dbTableNames[0];
 		String tableName = dbTableNames[1];
 
@@ -260,7 +262,7 @@ public class SplitJdbcTemplate implements SplitJdbcOperations {
 
 		int dbNo = splitStrategy.getDbNo(splitKey);
 		int tableNo = splitStrategy.getTableNo(splitKey);
-		sql = SqlUtils.splitSelectSql(sql, dbNo, tableNo);
+		sql = SqlUtil.splitSelectSql(sql, dbNo, tableNo);
 
 		int nodeNo = splitStrategy.getNodeNo(splitKey);
 		SplitNode sn = splitNdoes.get(nodeNo);
@@ -361,7 +363,7 @@ public class SplitJdbcTemplate implements SplitJdbcOperations {
 
 	public <K> int update(K splitKey, String sql, Object... args)
 			throws DataAccessException {
-		String[] dbTableNames = SqlUtils.getDbTableNamesUpdate(sql);
+		String[] dbTableNames = SqlUtil.getDbTableNamesUpdate(sql);
 		String dbName = dbTableNames[0];
 		String tableName = dbTableNames[1];
 
@@ -373,7 +375,7 @@ public class SplitJdbcTemplate implements SplitJdbcOperations {
 
 		int dbNo = splitStrategy.getDbNo(splitKey);
 		int tableNo = splitStrategy.getTableNo(splitKey);
-		sql = SqlUtils.splitUpdateSql(sql, dbNo, tableNo);
+		sql = SqlUtil.splitUpdateSql(sql, dbNo, tableNo);
 
 		int nodeNo = splitStrategy.getNodeNo(splitKey);
 		SplitNode sn = splitNdoes.get(nodeNo);
