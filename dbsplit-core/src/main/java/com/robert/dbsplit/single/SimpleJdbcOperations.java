@@ -9,5 +9,5 @@ public interface SimpleJdbcOperations {
 
 	public <T> T get(long id, final Class<T> clazz);
 
-	public <T> T get(String key, String value, final Class<T> clazz);
+	public <T> T get(String name, String value, final Class<T> clazz);
 }

@@ -1,7 +1,7 @@
 package com.robert.dbsplit.core;
 
 public interface SimpleSplitJdbcOperations extends SplitJdbcOperations {
-	
+
 	public <K, T> void insert(K splitKey, T bean);
 
 	public <K, T> void update(K splitKey, T bean);
@@ -10,6 +10,7 @@ public interface SimpleSplitJdbcOperations extends SplitJdbcOperations {
 
 	public <K, T> T get(K splitKey, long id, final Class<T> clazz);
 
-	public <K, T> T get(K splitKey, String key, String value, final Class<T> clazz);
+	public <K, T> T get(K splitKey, String key, String value,
+			final Class<T> clazz);
 
 }

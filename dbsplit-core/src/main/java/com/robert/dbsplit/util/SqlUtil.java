@@ -49,8 +49,8 @@ public abstract class SqlUtil {
 			tablePrefix = OrmUtil.javaClassName2DbTableName(bean.getClass()
 					.getSimpleName());
 
-		sb.append(getQualifiedTableName(databasePrefix, tablePrefix, databseIndex,
-				tableIndex));
+		sb.append(getQualifiedTableName(databasePrefix, tablePrefix,
+				databseIndex, tableIndex));
 
 		sb.append("(");
 
@@ -143,9 +143,9 @@ public abstract class SqlUtil {
 			String databasePrefix, String tablePrefix) {
 		return generateUpdateSql(bean, databasePrefix, tablePrefix, -1, -1);
 	}
-	
-	
-	public static <T> SqlRunningBean generateDeleteSql(long id, Class<T> clazz, String databasePrefix, String tablePrefix, int databaseIndex,
+
+	public static <T> SqlRunningBean generateDeleteSql(long id, Class<T> clazz,
+			String databasePrefix, String tablePrefix, int databaseIndex,
 			int tableIndex) {
 		final StringBuilder sb = new StringBuilder();
 		sb.append("delete from ");
@@ -154,17 +154,17 @@ public abstract class SqlUtil {
 			tablePrefix = OrmUtil.javaClassName2DbTableName(clazz
 					.getSimpleName());
 
-		sb.append(getQualifiedTableName(databasePrefix, tablePrefix, databaseIndex,
-				tableIndex));
+		sb.append(getQualifiedTableName(databasePrefix, tablePrefix,
+				databaseIndex, tableIndex));
 
 		sb.append("where ID = ?");
 
 		List<Object> params = new LinkedList<Object>();
 		params.add(id);
-		
+
 		return new SqlRunningBean(sb.toString(), params.toArray());
 	}
-	
+
 	public static <T> SqlRunningBean generateDeleteSql(long id, Class<T> clazz) {
 		return generateDeleteSql(id, clazz, null, null, -1, -1);
 	}
@@ -179,6 +179,45 @@ public abstract class SqlUtil {
 		return generateDeleteSql(id, clazz, databasePrefix, tablePrefix, -1, -1);
 	}
 
+	public static <T> SqlRunningBean generateSelectSql(String name,
+			Object value, Class<T> clazz, String databasePrefix,
+			String tablePrefix, int databaseIndex, int tableIndex) {
+		StringBuilder sb = new StringBuilder();
+		sb.append("select * from ");
+
+		if (StringUtils.isEmpty(tablePrefix))
+			tablePrefix = OrmUtil.javaClassName2DbTableName(clazz
+					.getSimpleName());
+
+		sb.append(getQualifiedTableName(databasePrefix, tablePrefix,
+				databaseIndex, tableIndex));
+
+		sb.append("where ");
+		sb.append(name).append("=?");
+
+		List<Object> params = new LinkedList<Object>();
+		params.add(value);
+
+		return new SqlRunningBean(sb.toString(), params.toArray());
+	}
+
+	public static <T> SqlRunningBean generateSelectSql(String name,
+			Object value, Class<T> clazz) {
+		return generateSelectSql(name, value, clazz, null, null, -1, -1);
+	}
+
+	public static <T> SqlRunningBean generateSelectSql(String name,
+			Object value, Class<T> clazz, String databasePrefix) {
+		return generateSelectSql(name, value, clazz, databasePrefix, null, -1,
+				-1);
+	}
+
+	public static <T> SqlRunningBean generateSelectSql(String name,
+			Object value, Class<T> clazz, String databasePrefix,
+			String tablePrefix) {
+		return generateSelectSql(name, value, clazz, databasePrefix,
+				tablePrefix, -1, -1);
+	}
 
 	private static String getQualifiedTableName(String databasePrefix,
 			String tablePrefix, int dbIndex, int tableIndex) {
@@ -320,4 +359,5 @@ public abstract class SqlUtil {
 
 		return sql;
 	}
+
 }
