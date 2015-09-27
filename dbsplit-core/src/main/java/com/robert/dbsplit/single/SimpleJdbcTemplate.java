@@ -2,6 +2,7 @@ package com.robert.dbsplit.single;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -58,7 +59,7 @@ public class SimpleJdbcTemplate extends JdbcTemplate implements
 		return bean;
 	}
 
-	public <T> T get(String name, String value, final Class<T> clazz) {
+	public <T> T get(String name, Object value, final Class<T> clazz) {
 		SqlRunningBean srb = SqlUtil.generateSelectSql(name, value, clazz);
 
 		T bean = this.queryForObject(srb.getSql(), srb.getParams(),
@@ -71,4 +72,16 @@ public class SimpleJdbcTemplate extends JdbcTemplate implements
 		return bean;
 	}
 
+	public <T> List<T> search(final T bean) {
+		SqlRunningBean srb = SqlUtil.generateSearchSql(bean);
+
+		List<T> beans = this.query(srb.getSql(), srb.getParams(),
+				new RowMapper<T>() {
+					public T mapRow(ResultSet rs, int rowNum)
+							throws SQLException {
+						return (T) OrmUtil.convertRow2Bean(rs, bean.getClass());
+					}
+				});
+		return beans;
+	}
 }

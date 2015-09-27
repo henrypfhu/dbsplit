@@ -256,8 +256,12 @@ public abstract class SqlUtil {
 		return new SqlRunningBean(sb.toString(), params.toArray());
 	}
 
-	public static <T> SqlRunningBean generateSearchSql(T bean, String dbPrefix, String tablePrefix, int dbNo, int tableNo) {
-		return generateSearchSql(bean, null, null, null, dbPrefix, tablePrefix, dbNo, tableNo);
+	public static <T> SqlRunningBean generateSearchSql(T bean, String databasePrefix, String tablePrefix, int databaseIndex, int tableIndex) {
+		return generateSearchSql(bean, null, null, null, databasePrefix, tablePrefix, databaseIndex, tableIndex);
+	}
+	
+	public static <T> SqlRunningBean generateSearchSql(T bean) {
+		return generateSearchSql(bean, null, null, null, null, null, -1, -1);
 	}
 
 	private static String getQualifiedTableName(String databasePrefix,
