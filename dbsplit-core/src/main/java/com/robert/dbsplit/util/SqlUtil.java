@@ -218,6 +218,47 @@ public abstract class SqlUtil {
 		return generateSelectSql(name, value, clazz, databasePrefix,
 				tablePrefix, -1, -1);
 	}
+	
+	public static <T> SqlRunningBean generateSearchSql(T bean, String name, Object valueFrom, Object valueTo, String databasePrefix, String tablePrefix, int databaseIndex, int tableIndex) {
+		final StringBuilder sb = new StringBuilder();
+		sb.append("select * from ");
+		
+		if (StringUtils.isEmpty(tablePrefix))
+			tablePrefix = OrmUtil.javaClassName2DbTableName(bean.getClass()
+					.getSimpleName());
+		sb.append(getQualifiedTableName(databasePrefix, tablePrefix,
+				databaseIndex, tableIndex));
+
+		sb.append(" where ");
+		
+		final List<Object> params = new LinkedList<Object>();
+
+		new FieldVisitor<T>(bean).visit(new FieldHandler() {
+			public void handle(int index, Field field, Object value) {
+				if (index != 0)
+					sb.append(" and ");
+
+				sb.append(OrmUtil.javaFieldName2DbFieldName(field.getName()))
+						.append("=? ");
+
+				if (value instanceof Enum)
+					value = ((Enum<?>) value).ordinal();
+
+				params.add(value);
+			}
+		});
+		
+		sb.append(" and ").append(name).append(">=? and ");
+		sb.append(name).append("<=? ");
+		params.add(valueFrom);
+		params.add(valueTo);
+		
+		return new SqlRunningBean(sb.toString(), params.toArray());
+	}
+
+	public static <T> SqlRunningBean generateSearchSql(T bean, String dbPrefix, String tablePrefix, int dbNo, int tableNo) {
+		return generateSearchSql(bean, null, null, null, dbPrefix, tablePrefix, dbNo, tableNo);
+	}
 
 	private static String getQualifiedTableName(String databasePrefix,
 			String tablePrefix, int dbIndex, int tableIndex) {
@@ -237,6 +278,8 @@ public abstract class SqlUtil {
 
 		return sb.toString();
 	}
+	
+	
 
 	// TODO need to handle select, insert, delete, update separately
 
