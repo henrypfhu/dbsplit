@@ -84,4 +84,13 @@ public class SimpleJdbcTemplate extends JdbcTemplate implements
 				});
 		return beans;
 	}
+
+	public <T> List<T> search(String sql, Object[] params, final Class<T> clazz) {
+		List<T> beans = this.query(sql, params, new RowMapper<T>() {
+			public T mapRow(ResultSet rs, int rowNum) throws SQLException {
+				return (T) OrmUtil.convertRow2Bean(rs, clazz);
+			}
+		});
+		return beans;
+	}
 }

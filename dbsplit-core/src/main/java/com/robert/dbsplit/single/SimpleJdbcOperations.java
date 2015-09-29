@@ -14,4 +14,6 @@ public interface SimpleJdbcOperations {
 	public <T> T get(String name, Object value, final Class<T> clazz);
 
 	public <T> List<T> search(final T bean);
+
+	public <T> List<T> search(String sql, Object[] params, final Class<T> clazz);
 }
