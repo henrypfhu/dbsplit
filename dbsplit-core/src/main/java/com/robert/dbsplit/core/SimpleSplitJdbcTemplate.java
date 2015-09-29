@@ -23,7 +23,7 @@ public class SimpleSplitJdbcTemplate extends SplitJdbcTemplate implements
 	};
 
 	private enum SearchOper {
-		NORMAL, RANGE
+		NORMAL, RANGE, FIELD
 	};
 
 	public SimpleSplitJdbcTemplate() {
@@ -102,9 +102,15 @@ public class SimpleSplitJdbcTemplate extends SplitJdbcTemplate implements
 		case NORMAL:
 			srb = SqlUtil.generateSearchSql(bean, dbPrefix, tablePrefix, dbNo,
 					tableNo);
+			break;
 		case RANGE:
 			srb = SqlUtil.generateSearchSql(bean, name, valueFrom, valueTo,
 					dbPrefix, tablePrefix, dbNo, tableNo);
+			break;
+		case FIELD:
+			srb = SqlUtil.generateSearchSql(bean, name, valueFrom,
+					dbPrefix, tablePrefix, dbNo, tableNo);
+			break;
 		}
 
 		log.debug(
@@ -215,5 +221,10 @@ public class SimpleSplitJdbcTemplate extends SplitJdbcTemplate implements
 		long updateCount = jt.update(srb.getSql(), srb.getParams());
 		log.info("SimpleSplitJdbcTemplate.doUpdate, update record num: {}.",
 				updateCount);
+	}
+
+	public <K, T> List<T> search(K splitKey, T bean, String name, Object value) {
+		return doSearch(splitKey, bean, name, value, null,
+				SearchOper.FIELD);
 	}
 }

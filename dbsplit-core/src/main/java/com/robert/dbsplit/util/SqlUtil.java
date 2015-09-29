@@ -248,16 +248,25 @@ public abstract class SqlUtil {
 			}
 		});
 		
+		if (!StringUtils.isEmpty(name) && !StringUtils.isEmpty(valueFrom) && !StringUtils.isEmpty(valueTo)) {
 		sb.append(" and ").append(name).append(">=? and ");
 		sb.append(name).append("<=? ");
 		params.add(valueFrom);
 		params.add(valueTo);
+		} else if (!StringUtils.isEmpty(name) && !StringUtils.isEmpty(valueFrom) && StringUtils.isEmpty(valueTo)) {
+			sb.append(" and ").append(name).append("=? ");
+			params.add(valueFrom);			
+		}
 		
 		return new SqlRunningBean(sb.toString(), params.toArray());
 	}
 
 	public static <T> SqlRunningBean generateSearchSql(T bean, String databasePrefix, String tablePrefix, int databaseIndex, int tableIndex) {
 		return generateSearchSql(bean, null, null, null, databasePrefix, tablePrefix, databaseIndex, tableIndex);
+	}
+	
+	public static <T> SqlRunningBean generateSearchSql(T bean, String name, Object value, String databasePrefix, String tablePrefix, int databaseIndex, int tableIndex) {
+		return generateSearchSql(bean, name, value, null, databasePrefix, tablePrefix, databaseIndex, tableIndex);
 	}
 	
 	public static <T> SqlRunningBean generateSearchSql(T bean) {

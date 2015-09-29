@@ -20,4 +20,6 @@ public interface SimpleSplitJdbcOperations extends SplitJdbcOperations {
 	public <K, T> List<T> search(K splitKey, T bean, String name,
 			Object valueFrom, Object valueTo);
 
+	public <K, T> List<T> search(K splitKey, T bean, String name,
+			Object value);
 }
