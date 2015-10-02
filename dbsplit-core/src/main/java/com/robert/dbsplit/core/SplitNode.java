@@ -2,6 +2,7 @@ package com.robert.dbsplit.core;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicLong;
 
 import org.springframework.jdbc.core.JdbcTemplate;
 
@@ -9,7 +10,7 @@ public class SplitNode {
 	private JdbcTemplate masterTemplate;
 	private List<JdbcTemplate> slaveTemplates;
 
-	private int iter = 0;
+	private AtomicLong iter = new AtomicLong(0);
 
 	public SplitNode() {
 	}
@@ -50,12 +51,14 @@ public class SplitNode {
 		this.slaveTemplates.remove(jdbcTemplate);
 	}
 
-	public JdbcTemplate getRandomSlaveTempate() {
-		if (iter == Integer.MAX_VALUE)
-			iter = 0;
+	public JdbcTemplate getRoundRobinSlaveTempate() {
+		long iterValue = iter.incrementAndGet();
 
-		int index = iter++ % slaveTemplates.size();
-		return slaveTemplates.get(index);
+		// Still race condition, but it doesn't matter
+		if (iterValue == Long.MAX_VALUE)
+			iter.set(0);
+
+		return slaveTemplates.get((int) iterValue % slaveTemplates.size());
 	}
 
 }

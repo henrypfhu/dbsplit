@@ -270,7 +270,7 @@ public class SplitJdbcTemplate implements SplitJdbcOperations {
 		JdbcTemplate jt = null;
 
 		if (splitTable.isReadWriteSeparate())
-			jt = sn.getRandomSlaveTempate();
+			jt = sn.getRoundRobinSlaveTempate();
 		else
 			jt = sn.getMasterTemplate();
 
