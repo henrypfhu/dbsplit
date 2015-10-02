@@ -108,8 +108,8 @@ public class SimpleSplitJdbcTemplate extends SplitJdbcTemplate implements
 					dbPrefix, tablePrefix, dbNo, tableNo);
 			break;
 		case FIELD:
-			srb = SqlUtil.generateSearchSql(bean, name, valueFrom,
-					dbPrefix, tablePrefix, dbNo, tableNo);
+			srb = SqlUtil.generateSearchSql(bean, name, valueFrom, dbPrefix,
+					tablePrefix, dbNo, tableNo);
 			break;
 		}
 
@@ -224,7 +224,6 @@ public class SimpleSplitJdbcTemplate extends SplitJdbcTemplate implements
 	}
 
 	public <K, T> List<T> search(K splitKey, T bean, String name, Object value) {
-		return doSearch(splitKey, bean, name, value, null,
-				SearchOper.FIELD);
+		return doSearch(splitKey, bean, name, value, null, SearchOper.FIELD);
 	}
 }
