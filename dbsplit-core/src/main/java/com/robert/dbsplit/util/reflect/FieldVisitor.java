@@ -19,6 +19,8 @@ public class FieldVisitor<T> {
 	public void visit(FieldHandler fieldHandler) {
 		List<Field> fields = ReflectionUtil.getClassEffectiveFields(bean
 				.getClass());
+		
+		int count = 0;
 		for (int i = 0; i < fields.size(); i++) {
 			Field field = fields.get(i);
 
@@ -33,7 +35,7 @@ public class FieldVisitor<T> {
 					if (value instanceof Number
 							&& ((Number) value).doubleValue() == -1d)
 						continue;
-					fieldHandler.handle(i, field, value);
+					fieldHandler.handle(count ++, field, value);
 				}
 
 				field.setAccessible(access);
