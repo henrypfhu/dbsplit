@@ -35,6 +35,10 @@ public class FieldVisitor<T> {
 					if (value instanceof Number
 							&& ((Number) value).doubleValue() == -1d)
 						continue;
+					
+					if (value instanceof List) 
+						continue;
+					
 					fieldHandler.handle(count ++, field, value);
 				}
 
