@@ -6,7 +6,7 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
 public class SimpleSplitJdbcTemplateTest {
 	public static void main(String[] args) throws Exception {
 		ApplicationContext ac = new ClassPathXmlApplicationContext(
-				"spring/dbsplit-sample.xml");
+				"spring/dbsplit-test.xml");
 		SimpleSplitJdbcTemplate simpleSplitJdbcTemplate = (SimpleSplitJdbcTemplate) ac
 				.getBean("simpleSplitJdbcTemplate");
 

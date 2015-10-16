@@ -5,6 +5,11 @@
 	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
 	http://code.alibabatech.com/schema/dubbo http://code.alibabatech.com/schema/dubbo/dubbo.xsd">
 
+	<bean
+		class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+		<property name="locations" value="classpath:spring/dbsplit-test.properties" />
+	</bean>
+
 	<!-- SplitBizTemplate Entry -->
 
 	<bean name="simpleSplitJdbcTemplate" class="com.robert.dbsplit.core.SimpleSplitJdbcTemplate">
@@ -133,49 +138,49 @@
 
 	<bean id="masterDatasource0" parent="baseDataSource">
 		<property name="jdbcUrl">
-			<value>jdbc:mysql://localhost:3306/?useUnicode=true&amp;characterEncoding=UTF-8&amp;autoReconnect=true</value>
+			<value>jdbc:mysql://${dbsplit.master0.url}/?useUnicode=true&amp;characterEncoding=UTF-8&amp;autoReconnect=true</value>
 		</property>
 		<property name="user">
-			<value>testuser</value>
+			<value>${dbsplit.user}</value>
 		</property>
 		<property name="password">
-			<value>testpassword</value>
+			<value>${dbsplit.password}</value>
 		</property>
 	</bean>
 
 	<bean id="slaveDatasource00" parent="baseDataSource">
 		<property name="jdbcUrl">
-			<value>jdbc:mysql://localhost:3306/?useUnicode=true&amp;characterEncoding=UTF-8&amp;autoReconnect=true</value>
+			<value>jdbc:mysql://${dbsplit.slave0.url}/?useUnicode=true&amp;characterEncoding=UTF-8&amp;autoReconnect=true</value>
 		</property>
 		<property name="user">
-			<value>testuser</value>
+			<value>${dbsplit.user}</value>
 		</property>
 		<property name="password">
-			<value>testpassword</value>
+			<value>${dbsplit.password}</value>
 		</property>
 	</bean>
 
 	<bean id="masterDatasource1" parent="baseDataSource">
 		<property name="jdbcUrl">
-			<value>jdbc:mysql://localhost:3306/?useUnicode=true&amp;characterEncoding=UTF-8&amp;autoReconnect=true</value>
+			<value>jdbc:mysql://${dbsplit.master1.url}/?useUnicode=true&amp;characterEncoding=UTF-8&amp;autoReconnect=true</value>
 		</property>
 		<property name="user">
-			<value>testuser</value>
+			<value>${dbsplit.user}</value>
 		</property>
 		<property name="password">
-			<value>testpassword</value>
+			<value>${dbsplit.password}</value>
 		</property>
 	</bean>
 
 	<bean id="slaveDatasource10" parent="baseDataSource">
 		<property name="jdbcUrl">
-			<value>jdbc:mysql://localhost:3306/?useUnicode=true&amp;characterEncoding=UTF-8&amp;autoReconnect=true</value>
+			<value>jdbc:mysql://${dbsplit.slave1.url}/?useUnicode=true&amp;characterEncoding=UTF-8&amp;autoReconnect=true</value>
 		</property>
 		<property name="user">
-			<value>testuser</value>
+			<value>${dbsplit.user}</value>
 		</property>
 		<property name="password">
-			<value>testpassword</value>
+			<value>${dbsplit.password}</value>
 		</property>
 	</bean>
 </beans>
