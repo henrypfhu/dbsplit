@@ -16,17 +16,18 @@ public class SimpleSplitJdbcTemplateTest extends
 		AbstractTestNGSpringContextTests {
 	@Test(groups = { "simpleSplitJdbcTemplate" })
 	public void testSimpleSplitJdbcTemplate() {
-
 		SimpleSplitJdbcTemplate simpleSplitJdbcTemplate = (SimpleSplitJdbcTemplate) applicationContext
 				.getBean("simpleSplitJdbcTemplate");
 		IdService idService = (IdService) applicationContext
 				.getBean("idService");
 
+		// Make sure the id generated is not align multiple of 1000
 		Random random = new Random(new Date().getTime());
 		for (int i = 0; i < random.nextInt(16); i++)
 			idService.genId();
 
 		long id = idService.genId();
+		System.out.println("id:" + id);
 
 		TestTable testTable = new TestTable();
 		testTable.setId(id);
@@ -42,15 +43,18 @@ public class SimpleSplitJdbcTemplateTest extends
 		TestTable testTable1 = simpleSplitJdbcTemplate.get(id, id,
 				TestTable.class);
 
+		AssertJUnit.assertEquals(testTable.getId(), testTable1.getId());
 		AssertJUnit.assertEquals(testTable.getName(), testTable1.getName());
 		AssertJUnit.assertEquals(testTable.getGender(), testTable1.getGender());
 		AssertJUnit.assertEquals(testTable.getLstUpdUser(),
 				testTable1.getLstUpdUser());
-		// AssertJUnit.assertEquals(testTable.getLstUpdTime().getTime(),
-		// testTable1.getLstUpdTime().getTime());
+		// mysql store second as least time unit but java stores miliseconds, so
+		// round up the millisends from java time
+		AssertJUnit.assertEquals(
+				(testTable.getLstUpdTime().getTime() + 500) / 1000 * 1000,
+				testTable1.getLstUpdTime().getTime());
 
-		System.out.println(testTable1);
-
+		System.out.println("testTable1:" + testTable1);
 	}
 
 	@Test(groups = { "splitJdbcTemplate" })
