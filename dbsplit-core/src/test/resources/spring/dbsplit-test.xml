@@ -9,6 +9,13 @@
 		class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
 		<property name="locations" value="classpath:spring/dbsplit-test.properties" />
 	</bean>
+	
+	<bean id="idService" class="com.robert.vesta.service.factory.IdServiceFactoryBean"
+		init-method="init">
+		<property name="providerType" value="PROPERTY" />
+		
+		<property name="machineId" value="${vesta.machine}" />
+	</bean>
 
 	<!-- SplitBizTemplate Entry -->
 
@@ -35,7 +42,7 @@
 		<property name="dbNamePrefix" value="test_db" />
 		<property name="tableNamePrefix" value="test_table" />
 
-		<property name="dbNum" value="4" />
+		<property name="dbNum" value="2" />
 		<property name="tableNum" value="4" />
 
 		<property name="splitStrategyType" value="HORIZONTAL" />

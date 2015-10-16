@@ -1,9 +1,12 @@
-drop table if exists test_table_$I;
+drop table if exists TEST_TABLE_$I;
 
-create table test_table_$I
+create table TEST_TABLE_$I
 (
-    id bigint not null,
-    name varchar(128),
-    ctime timestamp not null,
-    primary key(id)         
+    ID bigint not null,
+    NAME varchar(128) not null,
+    GENDER               smallint default 0, 
+    LST_UPD_USER         varchar(128) default "SYSTEM",
+    LST_UPD_TIME         datetime default now(),
+    primary key(id),
+    unique key UK_NAME(NAME)
 );

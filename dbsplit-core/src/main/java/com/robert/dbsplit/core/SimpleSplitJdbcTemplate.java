@@ -70,7 +70,7 @@ public class SimpleSplitJdbcTemplate extends SplitJdbcTemplate implements
 				SearchOper.RANGE);
 	}
 
-	public <K, T> List<T> doSearch(K splitKey, final T bean, String name,
+	protected <K, T> List<T> doSearch(K splitKey, final T bean, String name,
 			Object valueFrom, Object valueTo, SearchOper searchOper) {
 		log.debug(
 				"SimpleSplitJdbcTemplate.doSearch, the split key: {}, the bean: {}, the name: {}, the valueFrom: {}, the valueTo: {}.",

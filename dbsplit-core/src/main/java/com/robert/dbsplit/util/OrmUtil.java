@@ -116,11 +116,11 @@ public abstract class OrmUtil {
 						break;
 					case Types.DATE:
 						param = Date.class;
-						value = rs.getDate(i);
+						value = rs.getTimestamp(i);
 						break;
 					case Types.TIMESTAMP:
 						param = Date.class;
-						value = rs.getDate(i);
+						value = rs.getTimestamp(i);
 						break;
 					default:
 						log.error("Dbsplit doesn't support column {} type {}.",
