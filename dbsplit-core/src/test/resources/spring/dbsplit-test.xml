@@ -21,6 +21,7 @@
 
 	<bean name="simpleSplitJdbcTemplate" class="com.robert.dbsplit.core.SimpleSplitJdbcTemplate">
 		<property name="splitTablesHolder" ref="splitTablesHolder" />
+		<property name="readWriteSeparate" value="${dbsplit.readWriteSeparate}" />
 	</bean>
 
 	<!-- SplitTablesHolder -->

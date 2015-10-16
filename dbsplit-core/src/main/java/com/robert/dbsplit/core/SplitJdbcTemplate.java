@@ -22,10 +22,13 @@ import org.springframework.jdbc.core.StatementCallback;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.jdbc.support.rowset.SqlRowSet;
 
+import com.robert.dbsplit.excep.NotSupportedException;
 import com.robert.dbsplit.util.SqlUtil;
 
 public class SplitJdbcTemplate implements SplitJdbcOperations {
 	protected SplitTablesHolder splitTablesHolder;
+
+	protected boolean readWriteSeparate = false;
 
 	public SplitJdbcTemplate() {
 
@@ -47,205 +50,177 @@ public class SplitJdbcTemplate implements SplitJdbcOperations {
 
 	public <T, K> T execute(K splitKey, ConnectionCallback<T> action)
 			throws DataAccessException {
-		// TODO Auto-generated method stub
-		return null;
+		throw new NotSupportedException();
 	}
 
 	public <T, K> T execute(K splitKey, StatementCallback<T> action)
 			throws DataAccessException {
-		// TODO Auto-generated method stub
-		return null;
+		throw new NotSupportedException();
 	}
 
 	public <K> void execute(K splitKey, String sql) throws DataAccessException {
-		// TODO Auto-generated method stub
+		throw new NotSupportedException();
 	}
 
 	public <T, K> T query(K splitKey, String sql, ResultSetExtractor<T> rse)
 			throws DataAccessException {
-		// TODO Auto-generated method stub
-		return null;
+		throw new NotSupportedException();
 	}
 
 	public <K> void query(K splitKey, String sql, RowCallbackHandler rch)
 			throws DataAccessException {
-		// TODO Auto-generated method stub
+		throw new NotSupportedException();
 	}
 
 	public <T, K> List<T> query(K splitKey, String sql, RowMapper<T> rowMapper)
 			throws DataAccessException {
-		// TODO Auto-generated method stub
-		return null;
+		throw new NotSupportedException();
 	}
 
 	public <T, K> T queryForObject(K splitKey, String sql,
 			RowMapper<T> rowMapper) throws DataAccessException {
-		// TODO Auto-generated method stub
-		return null;
+		throw new NotSupportedException();
 	}
 
 	public <T, K> T queryForObject(K splitKey, String sql, Class<T> requiredType)
 			throws DataAccessException {
-		// TODO Auto-generated method stub
-		return null;
+		throw new NotSupportedException();
 	}
 
 	public <K> Map<String, Object> queryForMap(K splitKey, String sql)
 			throws DataAccessException {
-		// TODO Auto-generated method stub
-		return null;
+		throw new NotSupportedException();
 	}
 
 	public <T, K> List<T> queryForList(K splitKey, String sql,
 			Class<T> elementType) throws DataAccessException {
-		// TODO Auto-generated method stub
-		return null;
+		throw new NotSupportedException();
 	}
 
 	public <K> List<Map<String, Object>> queryForList(K splitKey, String sql)
 			throws DataAccessException {
-		// TODO Auto-generated method stub
-		return null;
+		throw new NotSupportedException();
 	}
 
 	public <K> SqlRowSet queryForRowSet(K splitKey, String sql)
 			throws DataAccessException {
-		// TODO Auto-generated method stub
-		return null;
+		throw new NotSupportedException();
 	}
 
 	public <K> int update(K splitKey, String sql) throws DataAccessException {
-		// TODO Auto-generated method stub
-		return 0;
+		throw new NotSupportedException();
 	}
 
 	public <K> int[] batchUpdate(K splitKey, String... sql)
 			throws DataAccessException {
-		// TODO Auto-generated method stub
-		return null;
+		throw new NotSupportedException();
 	}
 
 	public <T, K> T execute(K splitKey, PreparedStatementCreator psc,
 			PreparedStatementCallback<T> action) throws DataAccessException {
-		// TODO Auto-generated method stub
-		return null;
+		throw new NotSupportedException();
 	}
 
 	public <T, K> T execute(K splitKey, String sql,
 			PreparedStatementCallback<T> action) throws DataAccessException {
-		// TODO Auto-generated method stub
-		return null;
+		throw new NotSupportedException();
 	}
 
 	public <T, K> T query(K splitKey, PreparedStatementCreator psc,
 			ResultSetExtractor<T> rse) throws DataAccessException {
-		// TODO Auto-generated method stub
-		return null;
+		throw new NotSupportedException();
 	}
 
 	public <T, K> T query(K splitKey, String sql, PreparedStatementSetter pss,
 			ResultSetExtractor<T> rse) throws DataAccessException {
-		// TODO Auto-generated method stub
-		return null;
+		throw new NotSupportedException();
 	}
 
 	public <T, K> T query(K splitKey, String sql, Object[] args,
 			int[] argTypes, ResultSetExtractor<T> rse)
 			throws DataAccessException {
-		// TODO Auto-generated method stub
-		return null;
+		throw new NotSupportedException();
 	}
 
 	public <T, K> T query(K splitKey, String sql, Object[] args,
 			ResultSetExtractor<T> rse) throws DataAccessException {
-		// TODO Auto-generated method stub
-		return null;
+		throw new NotSupportedException();
 	}
 
 	public <T, K> T query(K splitKey, String sql, ResultSetExtractor<T> rse,
 			Object... args) throws DataAccessException {
-		// TODO Auto-generated method stub
-		return null;
+		throw new NotSupportedException();
 	}
 
 	public <K> void query(K splitKey, PreparedStatementCreator psc,
 			RowCallbackHandler rch) throws DataAccessException {
-		// TODO Auto-generated method stub
+		throw new NotSupportedException();
 	}
 
 	public <K> void query(K splitKey, String sql, PreparedStatementSetter pss,
 			RowCallbackHandler rch) throws DataAccessException {
-		// TODO Auto-generated method stub
+		throw new NotSupportedException();
 	}
 
 	public <K> void query(K splitKey, String sql, Object[] args,
 			int[] argTypes, RowCallbackHandler rch) throws DataAccessException {
-		// TODO Auto-generated method stub
+		throw new NotSupportedException();
 	}
 
 	public <K> void query(K splitKey, String sql, Object[] args,
 			RowCallbackHandler rch) throws DataAccessException {
-		// TODO Auto-generated method stub
+		throw new NotSupportedException();
 	}
 
 	public <K> void query(K splitKey, String sql, RowCallbackHandler rch,
 			Object... args) throws DataAccessException {
-		// TODO Auto-generated method stub
+		throw new NotSupportedException();
 	}
 
 	public <T, K> List<T> query(K splitKey, PreparedStatementCreator psc,
 			RowMapper<T> rowMapper) throws DataAccessException {
-		// TODO Auto-generated method stub
-		return null;
+		throw new NotSupportedException();
 	}
 
 	public <T, K> List<T> query(K splitKey, String sql,
 			PreparedStatementSetter pss, RowMapper<T> rowMapper)
 			throws DataAccessException {
-		// TODO Auto-generated method stub
-		return null;
+		throw new NotSupportedException();
 	}
 
 	public <T, K> List<T> query(K splitKey, String sql, Object[] args,
 			int[] argTypes, RowMapper<T> rowMapper) throws DataAccessException {
-		// TODO Auto-generated method stub
-		return null;
+		throw new NotSupportedException();
 	}
 
 	public <T, K> List<T> query(K splitKey, String sql, Object[] args,
 			RowMapper<T> rowMapper) throws DataAccessException {
-		// TODO Auto-generated method stub
-		return null;
+		throw new NotSupportedException();
 	}
 
 	public <T, K> List<T> query(K splitKey, String sql, RowMapper<T> rowMapper,
 			Object... args) throws DataAccessException {
-		// TODO Auto-generated method stub
-		return null;
+		throw new NotSupportedException();
 	}
 
 	public <T, K> T queryForObject(K splitKey, String sql, Object[] args,
 			int[] argTypes, RowMapper<T> rowMapper) throws DataAccessException {
-		// TODO Auto-generated method stub
-		return null;
+		throw new NotSupportedException();
 	}
 
 	public <T, K> T queryForObject(K splitKey, String sql, Object[] args,
 			RowMapper<T> rowMapper) throws DataAccessException {
-		// TODO Auto-generated method stub
-		return null;
+		throw new NotSupportedException();
 	}
 
 	public <T, K> T queryForObject(K splitKey, String sql,
 			RowMapper<T> rowMapper, Object... args) throws DataAccessException {
-		// TODO Auto-generated method stub
-		return null;
+		throw new NotSupportedException();
 	}
 
 	public <T, K> T queryForObject(K splitKey, String sql, Object[] args,
 			int[] argTypes, Class<T> requiredType) throws DataAccessException {
-		// TODO Auto-generated method stub
-		return null;
+		throw new NotSupportedException();
 	}
 
 	public <T, K> T queryForObject(K splitKey, String sql, Object[] args,
@@ -279,86 +254,72 @@ public class SplitJdbcTemplate implements SplitJdbcOperations {
 
 	public <T, K> T queryForObject(K splitKey, String sql,
 			Class<T> requiredType, Object... args) throws DataAccessException {
-		// TODO Auto-generated method stub
-		return null;
+		throw new NotSupportedException();
 	}
 
 	public <K> Map<String, Object> queryForMap(K splitKey, String sql,
 			Object[] args, int[] argTypes) throws DataAccessException {
-		// TODO Auto-generated method stub
-		return null;
+		throw new NotSupportedException();
 	}
 
 	public <K> Map<String, Object> queryForMap(K splitKey, String sql,
 			Object... args) throws DataAccessException {
-		// TODO Auto-generated method stub
-		return null;
+		throw new NotSupportedException();
 	}
 
 	public <T, K> List<T> queryForList(K splitKey, String sql, Object[] args,
 			int[] argTypes, Class<T> elementType) throws DataAccessException {
-		// TODO Auto-generated method stub
-		return null;
+		throw new NotSupportedException();
 	}
 
 	public <T, K> List<T> queryForList(K splitKey, String sql, Object[] args,
 			Class<T> elementType) throws DataAccessException {
-		// TODO Auto-generated method stub
-		return null;
+		throw new NotSupportedException();
 	}
 
 	public <T, K> List<T> queryForList(K splitKey, String sql,
 			Class<T> elementType, Object... args) throws DataAccessException {
-		// TODO Auto-generated method stub
-		return null;
+		throw new NotSupportedException();
 	}
 
 	public <K> List<Map<String, Object>> queryForList(K splitKey, String sql,
 			Object[] args, int[] argTypes) throws DataAccessException {
-		// TODO Auto-generated method stub
-		return null;
+		throw new NotSupportedException();
 	}
 
 	public <K> List<Map<String, Object>> queryForList(K splitKey, String sql,
 			Object... args) throws DataAccessException {
-		// TODO Auto-generated method stub
-		return null;
+		throw new NotSupportedException();
 	}
 
 	public <K> SqlRowSet queryForRowSet(K splitKey, String sql, Object[] args,
 			int[] argTypes) throws DataAccessException {
-		// TODO Auto-generated method stub
-		return null;
+		throw new NotSupportedException();
 	}
 
 	public <K> SqlRowSet queryForRowSet(K splitKey, String sql, Object... args)
 			throws DataAccessException {
-		// TODO Auto-generated method stub
-		return null;
+		throw new NotSupportedException();
 	}
 
 	public <K> int update(K splitKey, PreparedStatementCreator psc)
 			throws DataAccessException {
-		// TODO Auto-generated method stub
-		return 0;
+		throw new NotSupportedException();
 	}
 
 	public <K> int update(K splitKey, PreparedStatementCreator psc,
 			KeyHolder generatedKeyHolder) throws DataAccessException {
-		// TODO Auto-generated method stub
-		return 0;
+		throw new NotSupportedException();
 	}
 
 	public <K> int update(K splitKey, String sql, PreparedStatementSetter pss)
 			throws DataAccessException {
-		// TODO Auto-generated method stub
-		return 0;
+		throw new NotSupportedException();
 	}
 
 	public <K> int update(K splitKey, String sql, Object[] args, int[] argTypes)
 			throws DataAccessException {
-		// TODO Auto-generated method stub
-		return 0;
+		throw new NotSupportedException();
 	}
 
 	public <K> int update(K splitKey, String sql, Object... args)
@@ -388,48 +349,41 @@ public class SplitJdbcTemplate implements SplitJdbcOperations {
 
 	public <K> int[] batchUpdate(K splitKey, String sql,
 			BatchPreparedStatementSetter pss) throws DataAccessException {
-		// TODO Auto-generated method stub
-		return null;
+		throw new NotSupportedException();
 	}
 
 	public <K> int[] batchUpdate(K splitKey, String sql,
 			List<Object[]> batchArgs) throws DataAccessException {
-		// TODO Auto-generated method stub
-		return null;
+		throw new NotSupportedException();
 	}
 
 	public <K> int[] batchUpdate(K splitKey, String sql,
 			List<Object[]> batchArgs, int[] argTypes)
 			throws DataAccessException {
-		// TODO Auto-generated method stub
-		return null;
+		throw new NotSupportedException();
 	}
 
 	public <T, K> int[][] batchUpdate(K splitKey, String sql,
 			Collection<T> batchArgs, int batchSize,
 			ParameterizedPreparedStatementSetter<T> pss)
 			throws DataAccessException {
-		// TODO Auto-generated method stub
-		return null;
+		throw new NotSupportedException();
 	}
 
 	public <T, K> T execute(K splitKey, CallableStatementCreator csc,
 			CallableStatementCallback<T> action) throws DataAccessException {
-		// TODO Auto-generated method stub
-		return null;
+		throw new NotSupportedException();
 	}
 
 	public <T, K> T execute(K splitKey, String callString,
 			CallableStatementCallback<T> action) throws DataAccessException {
-		// TODO Auto-generated method stub
-		return null;
+		throw new NotSupportedException();
 	}
 
 	public <K> Map<String, Object> call(K splitKey,
 			CallableStatementCreator csc, List<SqlParameter> declaredParameters)
 			throws DataAccessException {
-		// TODO Auto-generated method stub
-		return null;
+		throw new NotSupportedException();
 	}
 
 	public SplitTablesHolder getSplitTablesHolder() {
@@ -438,5 +392,31 @@ public class SplitJdbcTemplate implements SplitJdbcOperations {
 
 	public void setSplitTablesHolder(SplitTablesHolder splitTablesHolder) {
 		this.splitTablesHolder = splitTablesHolder;
+	}
+
+	public boolean isReadWriteSeparate() {
+		return readWriteSeparate;
+	}
+
+	public void setReadWriteSeparate(boolean readWriteSeparate) {
+		this.readWriteSeparate = readWriteSeparate;
+	}
+
+	protected JdbcTemplate getWriteJdbcTemplate(SplitNode sn) {
+		return getJdbcTemplate(sn, false);
+	}
+
+	protected JdbcTemplate getReadJdbcTemplate(SplitNode sn) {
+		return getJdbcTemplate(sn, true);
+	}
+
+	protected JdbcTemplate getJdbcTemplate(SplitNode sn, boolean read) {
+		if (!read)
+			return sn.getMasterTemplate();
+
+		if (readWriteSeparate)
+			return sn.getRoundRobinSlaveTempate();
+
+		return sn.getMasterTemplate();
 	}
 }

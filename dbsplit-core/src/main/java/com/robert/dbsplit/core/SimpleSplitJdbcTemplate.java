@@ -94,7 +94,7 @@ public class SimpleSplitJdbcTemplate extends SplitJdbcTemplate implements
 				splitKey, dbPrefix, tablePrefix, nodeNo, dbNo, tableNo);
 
 		SplitNode sn = splitNdoes.get(nodeNo);
-		JdbcTemplate jt = sn.getMasterTemplate();
+		JdbcTemplate jt = getReadJdbcTemplate(sn);
 
 		SqlRunningBean srb = null;
 
@@ -153,7 +153,7 @@ public class SimpleSplitJdbcTemplate extends SplitJdbcTemplate implements
 				splitKey, dbPrefix, tablePrefix, nodeNo, dbNo, tableNo);
 
 		SplitNode sn = splitNdoes.get(nodeNo);
-		JdbcTemplate jt = sn.getMasterTemplate();
+		JdbcTemplate jt = getReadJdbcTemplate(sn);
 
 		SqlRunningBean srb = SqlUtil.generateSelectSql(name, value, clazz,
 				dbPrefix, tablePrefix, dbNo, tableNo);
@@ -197,7 +197,7 @@ public class SimpleSplitJdbcTemplate extends SplitJdbcTemplate implements
 				splitKey, dbPrefix, tablePrefix, nodeNo, dbNo, tableNo);
 
 		SplitNode sn = splitNdoes.get(nodeNo);
-		JdbcTemplate jt = sn.getMasterTemplate();
+		JdbcTemplate jt = getWriteJdbcTemplate(sn);
 
 		SqlRunningBean srb = null;
 		switch (updateOper) {
