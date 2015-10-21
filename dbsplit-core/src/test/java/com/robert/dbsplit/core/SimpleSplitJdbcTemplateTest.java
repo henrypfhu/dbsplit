@@ -59,10 +59,12 @@ public class SimpleSplitJdbcTemplateTest extends
 
 	@Test(groups = { "splitJdbcTemplate" })
 	public void testSplitJdbcTemplate() {
-		/*
-		 * int r = simpleSplitJdbcTemplate.update(10,
-		 * "update test_db.test_table set name = ? where id = ?", new Object[] {
-		 * "test", 1 });
-		 */
+		SimpleSplitJdbcTemplate simpleSplitJdbcTemplate = (SimpleSplitJdbcTemplate) applicationContext
+				.getBean("simpleSplitJdbcTemplate");
+
+		int r = simpleSplitJdbcTemplate.update(10,
+				"update test_db.test_table set name = ? where id = ?",
+				new Object[] { "test", 1 });
+
 	}
 }

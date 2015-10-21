@@ -69,6 +69,10 @@ public class SimpleSplitJdbcTemplate extends SplitJdbcTemplate implements
 		return doSearch(splitKey, bean, name, valueFrom, valueTo,
 				SearchOper.RANGE);
 	}
+	
+	public <K, T> List<T> search(K splitKey, T bean, String name, Object value) {
+		return doSearch(splitKey, bean, name, value, null, SearchOper.FIELD);
+	}
 
 	protected <K, T> List<T> doSearch(K splitKey, final T bean, String name,
 			Object valueFrom, Object valueTo, SearchOper searchOper) {
@@ -221,9 +225,5 @@ public class SimpleSplitJdbcTemplate extends SplitJdbcTemplate implements
 		long updateCount = jt.update(srb.getSql(), srb.getParams());
 		log.info("SimpleSplitJdbcTemplate.doUpdate, update record num: {}.",
 				updateCount);
-	}
-
-	public <K, T> List<T> search(K splitKey, T bean, String name, Object value) {
-		return doSearch(splitKey, bean, name, value, null, SearchOper.FIELD);
 	}
 }
