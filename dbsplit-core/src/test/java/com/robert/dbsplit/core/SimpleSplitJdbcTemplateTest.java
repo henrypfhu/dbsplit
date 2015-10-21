@@ -62,9 +62,11 @@ public class SimpleSplitJdbcTemplateTest extends
 		SimpleSplitJdbcTemplate simpleSplitJdbcTemplate = (SimpleSplitJdbcTemplate) applicationContext
 				.getBean("simpleSplitJdbcTemplate");
 
-		int r = simpleSplitJdbcTemplate.update(10,
-				"update test_db.test_table set name = ? where id = ?",
-				new Object[] { "test", 1 });
+		int r = simpleSplitJdbcTemplate.update(26178012315653L,
+				"update test_db.TEST_TABLE set name = ? where id = ?",
+				new Object[] { "test", 26178012315653L });
+		
+		System.out.println(r);
 
 	}
 }

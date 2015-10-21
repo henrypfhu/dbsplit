@@ -370,6 +370,8 @@ public abstract class SqlUtil {
 		String tableName = null;
 		boolean inProcess = false;
 
+		// Need to opertimize for better performance
+
 		for (;;) {
 			lexer.nextToken();
 			Token tok = lexer.token();
@@ -395,34 +397,40 @@ public abstract class SqlUtil {
 	}
 
 	public static String splitUpdateSql(String sql, int dbNo, int tableNo) {
-		Lexer lexer = new Lexer(sql);
-
 		String dbName = null;
 		String tableName = null;
 		boolean inProcess = false;
 
-		for (;;) {
+		// Need to opertimize for better performance
+
+		Lexer lexer = new Lexer(sql);
+		do {
 			lexer.nextToken();
 			Token tok = lexer.token();
-			if ("UPDATE".equals(tok.name))
-				inProcess = true;
-			else if ("SET".equals(tok.name))
-				inProcess = false;
-			if (inProcess) {
-				if (dbName == null && (tok == Token.IDENTIFIER))
-					dbName = lexer.stringVal();
-				else if (dbName != null && (tok == Token.IDENTIFIER))
-					tableName = lexer.stringVal();
-			}
 			if (tok == Token.EOF) {
 				break;
 			}
-		}
+
+			if ("UPDATE".equals(tok.name))
+				inProcess = true;
+			if (inProcess) {
+				if (dbName == null && (tok == Token.IDENTIFIER))
+					dbName = lexer.stringVal();
+				else if (dbName != null && (tok == Token.IDENTIFIER)) {
+					tableName = lexer.stringVal();
+					break;
+				}
+			}
+		} while(true);
 
 		sql = sql.replace(dbName, dbName + "_" + dbNo);
 		sql = sql.replace(tableName, tableName + "_" + tableNo);
 
 		return sql;
+	}
+
+	public static String splitInsertSql(String sql, int dbNo, int tableNo) {
+		return null;
 	}
 
 }

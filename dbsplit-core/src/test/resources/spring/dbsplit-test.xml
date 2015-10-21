@@ -41,7 +41,7 @@
 		init-method="init">
 
 		<property name="dbNamePrefix" value="test_db" />
-		<property name="tableNamePrefix" value="test_table" />
+		<property name="tableNamePrefix" value="TEST_TABLE" />
 
 		<property name="dbNum" value="2" />
 		<property name="tableNum" value="4" />

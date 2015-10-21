@@ -41,7 +41,7 @@ public class SplitTable {
 	}
 
 	public void setTableNamePrefix(String tableNamePrifix) {
-		this.tableNamePrefix = tableNamePrifix.toUpperCase();
+		this.tableNamePrefix = tableNamePrifix;
 	}
 
 	public int getDbNum() {
