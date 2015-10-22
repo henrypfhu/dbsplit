@@ -4,14 +4,12 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 
-import com.robert.dbsplit.util.OrmUtil;
-import com.robert.dbsplit.util.SqlUtil;
-import com.robert.dbsplit.util.SqlUtil.SqlRunningBean;
+import com.robert.dbsplit.core.sql.OrmUtil;
+import com.robert.dbsplit.core.sql.SqlUtil;
+import com.robert.dbsplit.core.sql.SqlUtil.SqlRunningBean;
 
 public class SimpleSplitJdbcTemplate extends SplitJdbcTemplate implements
 		SimpleSplitJdbcOperations {
@@ -67,7 +65,7 @@ public class SimpleSplitJdbcTemplate extends SplitJdbcTemplate implements
 		return doSearch(splitKey, bean, name, valueFrom, valueTo,
 				SearchOper.RANGE);
 	}
-	
+
 	public <K, T> List<T> search(K splitKey, T bean, String name, Object value) {
 		return doSearch(splitKey, bean, name, value, null, SearchOper.FIELD);
 	}

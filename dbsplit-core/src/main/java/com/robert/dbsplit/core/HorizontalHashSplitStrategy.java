@@ -32,7 +32,7 @@ public class HorizontalHashSplitStrategy implements SplitStrategy {
 		int hashCode = splitKey.hashCode();
 		if (hashCode < 0)
 			hashCode = -hashCode;
-		
+
 		return hashCode;
 	}
 }

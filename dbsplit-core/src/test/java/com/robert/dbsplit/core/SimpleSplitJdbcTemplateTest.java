@@ -1,8 +1,11 @@
 package com.robert.dbsplit.core;
 
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.Date;
 import java.util.Random;
 
+import org.springframework.jdbc.core.RowMapper;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.testng.AbstractTestNGSpringContextTests;
 import org.testng.AssertJUnit;
@@ -62,11 +65,49 @@ public class SimpleSplitJdbcTemplateTest extends
 		SimpleSplitJdbcTemplate simpleSplitJdbcTemplate = (SimpleSplitJdbcTemplate) applicationContext
 				.getBean("simpleSplitJdbcTemplate");
 
-		int r = simpleSplitJdbcTemplate.update(26178012315653L,
-				"update test_db.TEST_TABLE set name = ? where id = ?",
-				new Object[] { "test", 26178012315653L });
-		
-		System.out.println(r);
+		IdService idService = (IdService) applicationContext
+				.getBean("idService");
 
+		// Make sure the id generated is not align multiple of 1000
+		Random random = new Random(new Date().getTime());
+		for (int i = 0; i < random.nextInt(16); i++)
+			idService.genId();
+
+		long id = idService.genId();
+		System.out.println("id:" + id);
+
+		int r = simpleSplitJdbcTemplate
+				.update(id,
+						"insert into test_db.TEST_TABLE(ID, NAME, GENDER, LST_UPD_USER, LST_UPD_TIME) values (?, ?, ?, ?, ?)",
+						new Object[] { id, "test" + id, 0, "test", new Date() });
+		AssertJUnit.assertEquals(1, r);
+
+		r = simpleSplitJdbcTemplate.update(id,
+				"update test_db.TEST_TABLE set name = ? where id = ?",
+				new Object[] { "test1" + id, id });
+		AssertJUnit.assertEquals(1, r);
+
+		TestTable tt = simpleSplitJdbcTemplate.queryForObject(id,
+				"select * from test_db.TEST_TABLE where id = ?",
+				new Object[] { id }, new RowMapper<TestTable>() {
+					public TestTable mapRow(ResultSet rs, int rowNum)
+							throws SQLException {
+						TestTable tt = new TestTable();
+						tt.setId(rs.getLong("ID"));
+						tt.setName(rs.getString("NAME"));
+						tt.setLstUpdUser(rs.getString("LST_UPD_USER"));
+						tt.setLstUpdTime(rs.getDate("LST_UPD_TIME"));
+						return tt;
+					}
+				});
+		AssertJUnit.assertNotNull(tt);
+		AssertJUnit.assertEquals(id, tt.getId());
+		AssertJUnit.assertEquals("test1" + id, tt.getName());
+		AssertJUnit.assertEquals("test", tt.getLstUpdUser());
+
+		r = simpleSplitJdbcTemplate.update(id,
+				"delete from test_db.TEST_TABLE where id = ?",
+				new Object[] { id });
+		AssertJUnit.assertEquals(1, r);
 	}
 }

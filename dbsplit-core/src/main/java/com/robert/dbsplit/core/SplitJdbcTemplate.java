@@ -24,9 +24,9 @@ import org.springframework.jdbc.core.StatementCallback;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.jdbc.support.rowset.SqlRowSet;
 
-import com.robert.dbsplit.core.sql.SplitSqlParser;
+import com.robert.dbsplit.core.sql.parser.SplitSqlParser;
+import com.robert.dbsplit.core.sql.parser.SplitSqlStructure;
 import com.robert.dbsplit.excep.NotSupportedException;
-import com.robert.dbsplit.util.SqlUtil;
 
 public class SplitJdbcTemplate implements SplitJdbcOperations {
 	protected static final Logger log = LoggerFactory
@@ -34,7 +34,52 @@ public class SplitJdbcTemplate implements SplitJdbcOperations {
 
 	protected SplitTablesHolder splitTablesHolder;
 
+	protected SplitActionRunner splitActionRunner = new SplitActionRunner();
+
 	protected boolean readWriteSeparate = false;
+
+	interface SplitAction<T> {
+		T doSplitAction(JdbcTemplate jt, String sql);
+	}
+
+	class SplitActionRunner {
+		<T, K> T runSplitAction(K splitKey, String sql,
+				SplitAction<T> splitAction) {
+			log.debug("runSplitAction entry, splitKey {} sql {}", splitKey, sql);
+
+			SplitSqlStructure splitSqlStructure = SplitSqlParser.INST
+					.parseSplitSql(sql);
+
+			String dbName = splitSqlStructure.getDbName();
+			String tableName = splitSqlStructure.getTableName();
+
+			SplitTable splitTable = splitTablesHolder.searchSplitTable(dbName,
+					tableName);
+
+			SplitStrategy splitStrategy = splitTable.getSplitStrategy();
+
+			int nodeNo = splitStrategy.getNodeNo(splitKey);
+			int dbNo = splitStrategy.getDbNo(splitKey);
+			int tableNo = splitStrategy.getTableNo(splitKey);
+
+			List<SplitNode> splitNodes = splitTable.getSplitNodes();
+
+			SplitNode sn = splitNodes.get(nodeNo);
+			JdbcTemplate jt = getJdbcTemplate(sn, false);
+
+			sql = splitSqlStructure.getSplitSql(dbNo, tableNo);
+
+			log.debug(
+					"runSplitAction do action, splitKey {} sql {} dbName {} tableName {} nodeNo {} dbNo {} tableNo {}",
+					splitKey, sql, dbName, tableName, nodeNo, dbNo, tableNo);
+			T result = splitAction.doSplitAction(jt, sql);
+
+			log.debug(
+					"runSplitAction return, {} are returned, splitKey {} sql {}",
+					result, splitKey, sql);
+			return result;
+		}
+	}
 
 	public SplitJdbcTemplate() {
 
@@ -70,47 +115,112 @@ public class SplitJdbcTemplate implements SplitJdbcOperations {
 
 	public <T, K> T query(K splitKey, String sql, ResultSetExtractor<T> rse)
 			throws DataAccessException {
-		throw new NotSupportedException();
+		return splitActionRunner.runSplitAction(splitKey, sql,
+				new SplitAction<T>() {
+					public T doSplitAction(JdbcTemplate jt, String sql) {
+						T result = jt.query(sql, rse);
+
+						return result;
+					}
+				});
 	}
 
 	public <K> void query(K splitKey, String sql, RowCallbackHandler rch)
 			throws DataAccessException {
-		throw new NotSupportedException();
+		splitActionRunner.runSplitAction(splitKey, sql,
+				new SplitAction<Object>() {
+					public Object doSplitAction(JdbcTemplate jt, String sql) {
+						jt.query(sql, rch);
+
+						return null;
+					}
+				});
 	}
 
 	public <T, K> List<T> query(K splitKey, String sql, RowMapper<T> rowMapper)
 			throws DataAccessException {
-		throw new NotSupportedException();
+		return splitActionRunner.runSplitAction(splitKey, sql,
+				new SplitAction<List<T>>() {
+					public List<T> doSplitAction(JdbcTemplate jt, String sql) {
+						List<T> result = jt.query(sql, rowMapper);
+
+						return result;
+					}
+				});
 	}
 
 	public <T, K> T queryForObject(K splitKey, String sql,
 			RowMapper<T> rowMapper) throws DataAccessException {
-		throw new NotSupportedException();
+		return splitActionRunner.runSplitAction(splitKey, sql,
+				new SplitAction<T>() {
+					public T doSplitAction(JdbcTemplate jt, String sql) {
+						T result = jt.queryForObject(sql, rowMapper);
+
+						return result;
+					}
+				});
 	}
 
 	public <T, K> T queryForObject(K splitKey, String sql, Class<T> requiredType)
 			throws DataAccessException {
-		throw new NotSupportedException();
+		return splitActionRunner.runSplitAction(splitKey, sql,
+				new SplitAction<T>() {
+					public T doSplitAction(JdbcTemplate jt, String sql) {
+						T result = jt.queryForObject(sql, requiredType);
+
+						return result;
+					}
+				});
 	}
 
 	public <K> Map<String, Object> queryForMap(K splitKey, String sql)
 			throws DataAccessException {
-		throw new NotSupportedException();
+		return splitActionRunner.runSplitAction(splitKey, sql,
+				new SplitAction<Map<String, Object>>() {
+					public Map<String, Object> doSplitAction(JdbcTemplate jt,
+							String sql) {
+						Map<String, Object> result = jt.queryForMap(sql);
+
+						return result;
+					}
+				});
 	}
 
 	public <T, K> List<T> queryForList(K splitKey, String sql,
 			Class<T> elementType) throws DataAccessException {
-		throw new NotSupportedException();
+		return splitActionRunner.runSplitAction(splitKey, sql,
+				new SplitAction<List<T>>() {
+					public List<T> doSplitAction(JdbcTemplate jt, String sql) {
+						List<T> result = jt.queryForList(sql, elementType);
+
+						return result;
+					}
+				});
 	}
 
 	public <K> List<Map<String, Object>> queryForList(K splitKey, String sql)
 			throws DataAccessException {
-		throw new NotSupportedException();
+		return splitActionRunner.runSplitAction(splitKey, sql,
+				new SplitAction<List<Map<String, Object>>>() {
+					public List<Map<String, Object>> doSplitAction(
+							JdbcTemplate jt, String sql) {
+						List<Map<String, Object>> result = jt.queryForList(sql);
+
+						return result;
+					}
+				});
 	}
 
 	public <K> SqlRowSet queryForRowSet(K splitKey, String sql)
 			throws DataAccessException {
-		throw new NotSupportedException();
+		return splitActionRunner.runSplitAction(splitKey, sql,
+				new SplitAction<SqlRowSet>() {
+					public SqlRowSet doSplitAction(JdbcTemplate jt, String sql) {
+						SqlRowSet result = jt.queryForRowSet(sql);
+
+						return result;
+					}
+				});
 	}
 
 	public <K> int update(K splitKey, String sql) throws DataAccessException {
@@ -139,23 +249,51 @@ public class SplitJdbcTemplate implements SplitJdbcOperations {
 
 	public <T, K> T query(K splitKey, String sql, PreparedStatementSetter pss,
 			ResultSetExtractor<T> rse) throws DataAccessException {
-		throw new NotSupportedException();
+		return splitActionRunner.runSplitAction(splitKey, sql,
+				new SplitAction<T>() {
+					public T doSplitAction(JdbcTemplate jt, String sql) {
+						T result = jt.query(sql, pss, rse);
+
+						return result;
+					}
+				});
 	}
 
 	public <T, K> T query(K splitKey, String sql, Object[] args,
 			int[] argTypes, ResultSetExtractor<T> rse)
 			throws DataAccessException {
-		throw new NotSupportedException();
+		return splitActionRunner.runSplitAction(splitKey, sql,
+				new SplitAction<T>() {
+					public T doSplitAction(JdbcTemplate jt, String sql) {
+						T result = jt.query(sql, args, argTypes, rse);
+
+						return result;
+					}
+				});
 	}
 
 	public <T, K> T query(K splitKey, String sql, Object[] args,
 			ResultSetExtractor<T> rse) throws DataAccessException {
-		throw new NotSupportedException();
+		return splitActionRunner.runSplitAction(splitKey, sql,
+				new SplitAction<T>() {
+					public T doSplitAction(JdbcTemplate jt, String sql) {
+						T result = jt.query(sql, args, rse);
+
+						return result;
+					}
+				});
 	}
 
 	public <T, K> T query(K splitKey, String sql, ResultSetExtractor<T> rse,
 			Object... args) throws DataAccessException {
-		throw new NotSupportedException();
+		return splitActionRunner.runSplitAction(splitKey, sql,
+				new SplitAction<T>() {
+					public T doSplitAction(JdbcTemplate jt, String sql) {
+						T result = jt.query(sql, rse, args);
+
+						return result;
+					}
+				});
 	}
 
 	public <K> void query(K splitKey, PreparedStatementCreator psc,
@@ -165,22 +303,50 @@ public class SplitJdbcTemplate implements SplitJdbcOperations {
 
 	public <K> void query(K splitKey, String sql, PreparedStatementSetter pss,
 			RowCallbackHandler rch) throws DataAccessException {
-		throw new NotSupportedException();
+		splitActionRunner.runSplitAction(splitKey, sql,
+				new SplitAction<Object>() {
+					public Object doSplitAction(JdbcTemplate jt, String sql) {
+						jt.query(sql, pss, rch);
+
+						return null;
+					}
+				});
 	}
 
 	public <K> void query(K splitKey, String sql, Object[] args,
 			int[] argTypes, RowCallbackHandler rch) throws DataAccessException {
-		throw new NotSupportedException();
+		splitActionRunner.runSplitAction(splitKey, sql,
+				new SplitAction<Object>() {
+					public Object doSplitAction(JdbcTemplate jt, String sql) {
+						jt.query(sql, args, argTypes, rch);
+
+						return null;
+					}
+				});
 	}
 
 	public <K> void query(K splitKey, String sql, Object[] args,
 			RowCallbackHandler rch) throws DataAccessException {
-		throw new NotSupportedException();
+		splitActionRunner.runSplitAction(splitKey, sql,
+				new SplitAction<Object>() {
+					public Object doSplitAction(JdbcTemplate jt, String sql) {
+						jt.query(sql, args, rch);
+
+						return null;
+					}
+				});
 	}
 
 	public <K> void query(K splitKey, String sql, RowCallbackHandler rch,
 			Object... args) throws DataAccessException {
-		throw new NotSupportedException();
+		splitActionRunner.runSplitAction(splitKey, sql,
+				new SplitAction<Object>() {
+					public Object doSplitAction(JdbcTemplate jt, String sql) {
+						jt.query(sql, rch, args);
+
+						return null;
+					}
+				});
 	}
 
 	public <T, K> List<T> query(K splitKey, PreparedStatementCreator psc,
@@ -191,121 +357,222 @@ public class SplitJdbcTemplate implements SplitJdbcOperations {
 	public <T, K> List<T> query(K splitKey, String sql,
 			PreparedStatementSetter pss, RowMapper<T> rowMapper)
 			throws DataAccessException {
-		throw new NotSupportedException();
+		return splitActionRunner.runSplitAction(splitKey, sql,
+				new SplitAction<List<T>>() {
+					public List<T> doSplitAction(JdbcTemplate jt, String sql) {
+						List<T> ret = jt.query(sql, pss, rowMapper);
+						return ret;
+					}
+				});
 	}
 
 	public <T, K> List<T> query(K splitKey, String sql, Object[] args,
 			int[] argTypes, RowMapper<T> rowMapper) throws DataAccessException {
-		throw new NotSupportedException();
+		return splitActionRunner.runSplitAction(splitKey, sql,
+				new SplitAction<List<T>>() {
+					public List<T> doSplitAction(JdbcTemplate jt, String sql) {
+						List<T> ret = jt.query(sql, args, argTypes, rowMapper);
+						return ret;
+					}
+				});
 	}
 
 	public <T, K> List<T> query(K splitKey, String sql, Object[] args,
 			RowMapper<T> rowMapper) throws DataAccessException {
-		throw new NotSupportedException();
+		return splitActionRunner.runSplitAction(splitKey, sql,
+				new SplitAction<List<T>>() {
+					public List<T> doSplitAction(JdbcTemplate jt, String sql) {
+						List<T> ret = jt.query(sql, args, rowMapper);
+						return ret;
+					}
+				});
 	}
 
 	public <T, K> List<T> query(K splitKey, String sql, RowMapper<T> rowMapper,
 			Object... args) throws DataAccessException {
-		throw new NotSupportedException();
+		return splitActionRunner.runSplitAction(splitKey, sql,
+				new SplitAction<List<T>>() {
+					public List<T> doSplitAction(JdbcTemplate jt, String sql) {
+						List<T> ret = jt.query(sql, rowMapper, args);
+						return ret;
+					}
+				});
 	}
 
 	public <T, K> T queryForObject(K splitKey, String sql, Object[] args,
 			int[] argTypes, RowMapper<T> rowMapper) throws DataAccessException {
-		throw new NotSupportedException();
+		return splitActionRunner.runSplitAction(splitKey, sql,
+				new SplitAction<T>() {
+					public T doSplitAction(JdbcTemplate jt, String sql) {
+						T ret = jt.queryForObject(sql, args, argTypes,
+								rowMapper);
+						return ret;
+					}
+				});
 	}
 
 	public <T, K> T queryForObject(K splitKey, String sql, Object[] args,
 			RowMapper<T> rowMapper) throws DataAccessException {
-		throw new NotSupportedException();
+		return splitActionRunner.runSplitAction(splitKey, sql,
+				new SplitAction<T>() {
+					public T doSplitAction(JdbcTemplate jt, String sql) {
+						T ret = jt.queryForObject(sql, args, rowMapper);
+						return ret;
+					}
+				});
 	}
 
 	public <T, K> T queryForObject(K splitKey, String sql,
 			RowMapper<T> rowMapper, Object... args) throws DataAccessException {
-		throw new NotSupportedException();
+		return splitActionRunner.runSplitAction(splitKey, sql,
+				new SplitAction<T>() {
+					public T doSplitAction(JdbcTemplate jt, String sql) {
+						T ret = jt.queryForObject(sql, rowMapper, args);
+						return ret;
+					}
+				});
 	}
 
 	public <T, K> T queryForObject(K splitKey, String sql, Object[] args,
 			int[] argTypes, Class<T> requiredType) throws DataAccessException {
-		throw new NotSupportedException();
+		return splitActionRunner.runSplitAction(splitKey, sql,
+				new SplitAction<T>() {
+					public T doSplitAction(JdbcTemplate jt, String sql) {
+						T ret = jt.queryForObject(sql, args, argTypes,
+								requiredType);
+						return ret;
+					}
+				});
 	}
 
 	public <T, K> T queryForObject(K splitKey, String sql, Object[] args,
 			Class<T> requiredType) throws DataAccessException {
-		String[] dbTableNames = SqlUtil.getDbTableNamesSelect(sql);
-		String dbName = dbTableNames[0];
-		String tableName = dbTableNames[1];
-
-		SplitTable splitTable = splitTablesHolder.searchSplitTable(dbName,
-				tableName);
-
-		SplitStrategy splitStrategy = splitTable.getSplitStrategy();
-		List<SplitNode> splitNdoes = splitTable.getSplitNodes();
-
-		int dbNo = splitStrategy.getDbNo(splitKey);
-		int tableNo = splitStrategy.getTableNo(splitKey);
-		sql = SqlUtil.splitSelectSql(sql, dbNo, tableNo);
-
-		int nodeNo = splitStrategy.getNodeNo(splitKey);
-		SplitNode sn = splitNdoes.get(nodeNo);
-
-		JdbcTemplate jt = null;
-
-		if (splitTable.isReadWriteSeparate())
-			jt = sn.getRoundRobinSlaveTempate();
-		else
-			jt = sn.getMasterTemplate();
-
-		return jt.queryForObject(sql, args, requiredType);
+		return splitActionRunner.runSplitAction(splitKey, sql,
+				new SplitAction<T>() {
+					public T doSplitAction(JdbcTemplate jt, String sql) {
+						T ret = jt.queryForObject(sql, args, requiredType);
+						return ret;
+					}
+				});
 	}
 
 	public <T, K> T queryForObject(K splitKey, String sql,
 			Class<T> requiredType, Object... args) throws DataAccessException {
-		throw new NotSupportedException();
+		return splitActionRunner.runSplitAction(splitKey, sql,
+				new SplitAction<T>() {
+					public T doSplitAction(JdbcTemplate jt, String sql) {
+						T ret = jt.queryForObject(sql, requiredType, args);
+						return ret;
+					}
+				});
 	}
 
 	public <K> Map<String, Object> queryForMap(K splitKey, String sql,
 			Object[] args, int[] argTypes) throws DataAccessException {
-		throw new NotSupportedException();
+		return splitActionRunner.runSplitAction(splitKey, sql,
+				new SplitAction<Map<String, Object>>() {
+					public Map<String, Object> doSplitAction(JdbcTemplate jt,
+							String sql) {
+						Map<String, Object> ret = jt.queryForMap(sql, args,
+								argTypes);
+						return ret;
+					}
+				});
 	}
 
 	public <K> Map<String, Object> queryForMap(K splitKey, String sql,
 			Object... args) throws DataAccessException {
-		throw new NotSupportedException();
+		return splitActionRunner.runSplitAction(splitKey, sql,
+				new SplitAction<Map<String, Object>>() {
+					public Map<String, Object> doSplitAction(JdbcTemplate jt,
+							String sql) {
+						Map<String, Object> ret = jt.queryForMap(sql, args);
+						return ret;
+					}
+				});
 	}
 
 	public <T, K> List<T> queryForList(K splitKey, String sql, Object[] args,
 			int[] argTypes, Class<T> elementType) throws DataAccessException {
-		throw new NotSupportedException();
+		return splitActionRunner.runSplitAction(splitKey, sql,
+				new SplitAction<List<T>>() {
+					public List<T> doSplitAction(JdbcTemplate jt, String sql) {
+						List<T> ret = jt.queryForList(sql, args, argTypes,
+								elementType);
+						return ret;
+					}
+				});
 	}
 
 	public <T, K> List<T> queryForList(K splitKey, String sql, Object[] args,
 			Class<T> elementType) throws DataAccessException {
-		throw new NotSupportedException();
+		return splitActionRunner.runSplitAction(splitKey, sql,
+				new SplitAction<List<T>>() {
+					public List<T> doSplitAction(JdbcTemplate jt, String sql) {
+						List<T> ret = jt.queryForList(sql, args, elementType);
+						return ret;
+					}
+				});
 	}
 
 	public <T, K> List<T> queryForList(K splitKey, String sql,
 			Class<T> elementType, Object... args) throws DataAccessException {
-		throw new NotSupportedException();
+		return splitActionRunner.runSplitAction(splitKey, sql,
+				new SplitAction<List<T>>() {
+					public List<T> doSplitAction(JdbcTemplate jt, String sql) {
+						List<T> ret = jt.queryForList(sql, elementType, args);
+						return ret;
+					}
+				});
 	}
 
 	public <K> List<Map<String, Object>> queryForList(K splitKey, String sql,
 			Object[] args, int[] argTypes) throws DataAccessException {
-		throw new NotSupportedException();
+		return splitActionRunner.runSplitAction(splitKey, sql,
+				new SplitAction<List<Map<String, Object>>>() {
+					public List<Map<String, Object>> doSplitAction(
+							JdbcTemplate jt, String sql) {
+						List<Map<String, Object>> ret = jt.queryForList(sql,
+								args, argTypes);
+						return ret;
+					}
+				});
 	}
 
 	public <K> List<Map<String, Object>> queryForList(K splitKey, String sql,
 			Object... args) throws DataAccessException {
-		throw new NotSupportedException();
+		return splitActionRunner.runSplitAction(splitKey, sql,
+				new SplitAction<List<Map<String, Object>>>() {
+					public List<Map<String, Object>> doSplitAction(
+							JdbcTemplate jt, String sql) {
+						List<Map<String, Object>> ret = jt.queryForList(sql,
+								args);
+						return ret;
+					}
+				});
 	}
 
 	public <K> SqlRowSet queryForRowSet(K splitKey, String sql, Object[] args,
 			int[] argTypes) throws DataAccessException {
-		throw new NotSupportedException();
+		return splitActionRunner.runSplitAction(splitKey, sql,
+				new SplitAction<SqlRowSet>() {
+					public SqlRowSet doSplitAction(JdbcTemplate jt, String sql) {
+						SqlRowSet ret = jt.queryForRowSet(sql, args, argTypes);
+						return ret;
+					}
+				});
+
 	}
 
 	public <K> SqlRowSet queryForRowSet(K splitKey, String sql, Object... args)
 			throws DataAccessException {
-		throw new NotSupportedException();
+		return splitActionRunner.runSplitAction(splitKey, sql,
+				new SplitAction<SqlRowSet>() {
+					public SqlRowSet doSplitAction(JdbcTemplate jt, String sql) {
+						SqlRowSet ret = jt.queryForRowSet(sql, args);
+						return ret;
+					}
+				});
 	}
 
 	public <K> int update(K splitKey, PreparedStatementCreator psc)
@@ -320,53 +587,37 @@ public class SplitJdbcTemplate implements SplitJdbcOperations {
 
 	public <K> int update(K splitKey, String sql, PreparedStatementSetter pss)
 			throws DataAccessException {
-		throw new NotSupportedException();
+		return splitActionRunner.runSplitAction(splitKey, sql,
+				new SplitAction<Integer>() {
+					public Integer doSplitAction(JdbcTemplate jt, String sql) {
+						Integer ret = jt.update(sql, pss);
+						return ret;
+					}
+				});
 	}
 
 	public <K> int update(K splitKey, String sql, Object[] args, int[] argTypes)
 			throws DataAccessException {
-		throw new NotSupportedException();
+		return splitActionRunner.runSplitAction(splitKey, sql,
+				new SplitAction<Integer>() {
+					public Integer doSplitAction(JdbcTemplate jt, String sql) {
+						Integer ret = jt.update(sql, args, argTypes);
+						return ret;
+					}
+				});
 	}
 
 	public <K> int update(K splitKey, String sql, Object... args)
 			throws DataAccessException {
-		log.trace("before split update, splitKey {} sql {} args {}", splitKey, sql,
-				args);
 
-		String[] dbTableNames = SqlUtil.getDbTableNamesUpdate(sql);
-		String dbName = dbTableNames[0];
-		String tableName = dbTableNames[1];
+		return splitActionRunner.runSplitAction(splitKey, sql,
+				new SplitAction<Integer>() {
+					public Integer doSplitAction(JdbcTemplate jt, String sql) {
+						Integer ret = jt.update(sql, args);
+						return ret;
+					}
+				});
 
-		SplitTable splitTable = splitTablesHolder.searchSplitTable(dbName,
-				tableName);
-
-		SplitStrategy splitStrategy = splitTable.getSplitStrategy();
-		List<SplitNode> splitNdoes = splitTable.getSplitNodes();
-
-		int dbNo = splitStrategy.getDbNo(splitKey);
-		int tableNo = splitStrategy.getTableNo(splitKey);
-
-		sql = SplitSqlParser.INST.parseSplitSql(sql).getSplitSql(dbNo, tableNo);
-
-		log.trace("after split update, splitKey {} sql {} args {}", splitKey, sql,
-				args);
-
-		int nodeNo = splitStrategy.getNodeNo(splitKey);
-		SplitNode sn = splitNdoes.get(nodeNo);
-
-		JdbcTemplate jt = getJdbcTemplate(sn, false);
-
-		log.trace(
-				"execute split update, splitKey {} sql {} args {} dbName {} tableName {} nodeNo {} dbNo {} tableNo {}",
-				splitKey, sql, args, dbName, tableName, nodeNo, dbNo, tableNo);
-
-		int ret = jt.update(sql, args);
-
-		log.trace(
-				"execute split update, {} records are updated, splitKey {} sql {} args {}",
-				splitKey, sql, args);
-
-		return ret;
 	}
 
 	public <K> int[] batchUpdate(K splitKey, String sql,

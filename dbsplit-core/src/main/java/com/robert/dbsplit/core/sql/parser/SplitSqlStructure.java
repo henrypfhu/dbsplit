@@ -1,4 +1,4 @@
-package com.robert.dbsplit.core.sql;
+package com.robert.dbsplit.core.sql.parser;
 
 import org.springframework.util.StringUtils;
 
@@ -67,7 +67,7 @@ public class SplitSqlStructure {
 		sb.append(previousPart).append(" ");
 		sb.append(dbName).append("_").append(dbNo);
 		sb.append(".");
-		sb.append(tableName).append("_").append(tableNo);
+		sb.append(tableName).append("_").append(tableNo).append(" ");
 		sb.append(sebsequentPart);
 
 		return sb.toString();

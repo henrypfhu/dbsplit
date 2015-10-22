@@ -1,4 +1,4 @@
-package com.robert.dbsplit.util;
+package com.robert.dbsplit.core.sql;
 
 import java.lang.reflect.Method;
 import java.sql.ResultSet;

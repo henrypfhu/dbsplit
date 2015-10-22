@@ -1,4 +1,4 @@
-package com.robert.dbsplit.util;
+package com.robert.dbsplit.core.sql;
 
 import java.lang.reflect.Field;
 import java.util.LinkedList;
@@ -6,8 +6,6 @@ import java.util.List;
 
 import org.springframework.util.StringUtils;
 
-import com.alibaba.druid.sql.parser.Lexer;
-import com.alibaba.druid.sql.parser.Token;
 import com.robert.dbsplit.util.reflect.FieldHandler;
 import com.robert.dbsplit.util.reflect.FieldVisitor;
 import com.robert.dbsplit.util.reflect.ReflectionUtil;
@@ -302,135 +300,4 @@ public abstract class SqlUtil {
 
 		return sb.toString();
 	}
-
-	// TODO need to handle select, insert, delete, update separately
-
-	// For SplitJdbcTemplate
-
-	public static String[] getDbTableNamesSelect(String sql) {
-		Lexer lexer = new Lexer(sql);
-
-		String dbName = null;
-		String tableName = null;
-		boolean inProcess = false;
-
-		for (;;) {
-			lexer.nextToken();
-			Token tok = lexer.token();
-			if ("FROM".equals(tok.name))
-				inProcess = true;
-			else if ("WHERE".equals(tok.name))
-				inProcess = false;
-			if (inProcess) {
-				if (dbName == null && (tok == Token.IDENTIFIER))
-					dbName = lexer.stringVal();
-				else if (dbName != null && (tok == Token.IDENTIFIER))
-					tableName = lexer.stringVal();
-			}
-			if (tok == Token.EOF) {
-				break;
-			}
-		}
-
-		return new String[] { dbName, tableName };
-	}
-
-	public static String[] getDbTableNamesUpdate(String sql) {
-		Lexer lexer = new Lexer(sql);
-
-		String dbName = null;
-		String tableName = null;
-		boolean inProcess = false;
-
-		for (;;) {
-			lexer.nextToken();
-			Token tok = lexer.token();
-			if ("UPDATE".equals(tok.name))
-				inProcess = true;
-			else if ("SET".equals(tok.name))
-				inProcess = false;
-			if (inProcess) {
-				if (dbName == null && (tok == Token.IDENTIFIER))
-					dbName = lexer.stringVal();
-				else if (dbName != null && (tok == Token.IDENTIFIER))
-					tableName = lexer.stringVal();
-			}
-			if (tok == Token.EOF) {
-				break;
-			}
-		}
-
-		return new String[] { dbName, tableName };
-	}
-
-	public static String splitSelectSql(String sql, int dbNo, int tableNo) {
-		Lexer lexer = new Lexer(sql);
-
-		String dbName = null;
-		String tableName = null;
-		boolean inProcess = false;
-
-		// Need to opertimize for better performance
-
-		for (;;) {
-			lexer.nextToken();
-			Token tok = lexer.token();
-			if ("FROM".equals(tok.name))
-				inProcess = true;
-			else if ("WHERE".equals(tok.name))
-				inProcess = false;
-			if (inProcess) {
-				if (dbName == null && (tok == Token.IDENTIFIER))
-					dbName = lexer.stringVal();
-				else if (dbName != null && (tok == Token.IDENTIFIER))
-					tableName = lexer.stringVal();
-			}
-			if (tok == Token.EOF) {
-				break;
-			}
-		}
-
-		sql = sql.replace(dbName, dbName + "_" + dbNo);
-		sql = sql.replace(tableName, tableName + "_" + tableNo);
-
-		return sql;
-	}
-
-	public static String splitUpdateSql(String sql, int dbNo, int tableNo) {
-		String dbName = null;
-		String tableName = null;
-		boolean inProcess = false;
-
-		// Need to opertimize for better performance
-
-		Lexer lexer = new Lexer(sql);
-		do {
-			lexer.nextToken();
-			Token tok = lexer.token();
-			if (tok == Token.EOF) {
-				break;
-			}
-
-			if ("UPDATE".equals(tok.name))
-				inProcess = true;
-			if (inProcess) {
-				if (dbName == null && (tok == Token.IDENTIFIER))
-					dbName = lexer.stringVal();
-				else if (dbName != null && (tok == Token.IDENTIFIER)) {
-					tableName = lexer.stringVal();
-					break;
-				}
-			}
-		} while(true);
-
-		sql = sql.replace(dbName, dbName + "_" + dbNo);
-		sql = sql.replace(tableName, tableName + "_" + tableNo);
-
-		return sql;
-	}
-
-	public static String splitInsertSql(String sql, int dbNo, int tableNo) {
-		return null;
-	}
-
 }

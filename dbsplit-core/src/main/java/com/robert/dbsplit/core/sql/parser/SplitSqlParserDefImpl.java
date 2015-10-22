@@ -1,4 +1,4 @@
-package com.robert.dbsplit.core.sql;
+package com.robert.dbsplit.core.sql.parser;
 
 import java.util.Map;
 
@@ -9,7 +9,7 @@ import org.springframework.util.StringUtils;
 
 import com.alibaba.druid.sql.parser.Lexer;
 import com.alibaba.druid.sql.parser.Token;
-import com.robert.dbsplit.core.sql.SplitSqlStructure.SqlType;
+import com.robert.dbsplit.core.sql.parser.SplitSqlStructure.SqlType;
 import com.robert.dbsplit.excep.NotSupportedException;
 
 public class SplitSqlParserDefImpl implements SplitSqlParser {
@@ -54,42 +54,42 @@ public class SplitSqlParserDefImpl implements SplitSqlParser {
 				break;
 			}
 
-			if (previous)
-				sbPreviousPart.append(lexer.stringVal()).append(" ");
+			if (tok.name != null)
+				switch (tok.name) {
+				case "SELECT":
+					splitSqlStructure.setSqlType(SqlType.SELECT);
+					break;
+
+				case "INSERT":
+					splitSqlStructure.setSqlType(SqlType.INSERT);
+					break;
+
+				case "UPDATE":
+					inProcess = true;
+					splitSqlStructure.setSqlType(SqlType.UPDATE);
+					break;
+
+				case "DELETE":
+					splitSqlStructure.setSqlType(SqlType.DELETE);
+					break;
+
+				case "INTO":
+					if (SqlType.INSERT.equals(splitSqlStructure.getSqlType()))
+						inProcess = true;
+					break;
+
+				case "FROM":
+					if (SqlType.SELECT.equals(splitSqlStructure.getSqlType())
+							|| SqlType.DELETE.equals(splitSqlStructure
+									.getSqlType()))
+						inProcess = true;
+					break;
+				}
 
 			if (sebsequent)
-				sbSebsequentPart.append(lexer.stringVal()).append(" ");
-
-			switch (tok.name) {
-			case "SELECT":
-				splitSqlStructure.setSqlType(SqlType.SELECT);
-				break;
-
-			case "INSERT":
-				splitSqlStructure.setSqlType(SqlType.INSERT);
-				break;
-
-			case "UPDATE":
-				inProcess = true;
-				splitSqlStructure.setSqlType(SqlType.UPDATE);
-				break;
-
-			case "DELETE":
-				splitSqlStructure.setSqlType(SqlType.DELETE);
-				break;
-
-			case "INTO":
-				if (SqlType.INSERT.equals(splitSqlStructure.getSqlType()))
-					inProcess = true;
-				break;
-
-			case "FROM":
-				if (SqlType.SELECT.equals(splitSqlStructure.getSqlType())
-						|| SqlType.DELETE
-								.equals(splitSqlStructure.getSqlType()))
-					inProcess = true;
-				break;
-			}
+				sbSebsequentPart.append(
+						tok == Token.IDENTIFIER ? lexer.stringVal() : tok.name)
+						.append(" ");
 
 			if (inProcess) {
 				if (dbName == null && tok == Token.IDENTIFIER) {
@@ -98,11 +98,17 @@ public class SplitSqlParserDefImpl implements SplitSqlParser {
 				} else if (dbName != null && tableName == null
 						&& tok == Token.IDENTIFIER) {
 					tableName = lexer.stringVal();
-					
+
 					inProcess = false;
 					sebsequent = true;
 				}
 			}
+
+			if (previous)
+				sbPreviousPart.append(
+						tok == Token.IDENTIFIER ? lexer.stringVal() : tok.name)
+						.append(" ");
+
 		} while (true);
 
 		if (StringUtils.isEmpty(dbName) || StringUtils.isEmpty(tableName))
