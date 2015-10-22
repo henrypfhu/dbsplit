@@ -1,5 +1,8 @@
 package com.robert.dbsplit.core.sql;
 
+import java.util.Map;
+
+import org.apache.commons.collections.map.LRUMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.StringUtils;
@@ -13,17 +16,31 @@ public class SplitSqlParserDefImpl implements SplitSqlParser {
 	private static final Logger log = LoggerFactory
 			.getLogger(SplitSqlParserDefImpl.class);
 
+	private static final int CACHE_SIZE = 1000;
+
+	@SuppressWarnings("unchecked")
+	private Map<String, SplitSqlStructure> cache = new LRUMap(CACHE_SIZE);
+
 	public SplitSqlParserDefImpl() {
 		log.info("Default SplitSqlParserDefImpl is used.");
 	}
 
 	public SplitSqlStructure parseSplitSql(String sql) {
-		SplitSqlStructure splitSqlStructure = new SplitSqlStructure();
+		SplitSqlStructure splitSqlStructure = cache.get(sql);
+
+		// Don't use if contains then get, race conditon may happens due to LRU
+		// map
+		if (splitSqlStructure != null)
+			return splitSqlStructure;
+
+		splitSqlStructure = new SplitSqlStructure();
 
 		String dbName = null;
 		String tableName = null;
 		boolean inProcess = false;
-		
+
+		boolean previous = true;
+		boolean sebsequent = false;
 		StringBuffer sbPreviousPart = new StringBuffer();
 		StringBuffer sbSebsequentPart = new StringBuffer();
 
@@ -37,11 +54,12 @@ public class SplitSqlParserDefImpl implements SplitSqlParser {
 				break;
 			}
 
-			if (!inProcess)
+			if (previous)
 				sbPreviousPart.append(lexer.stringVal()).append(" ");
-			else
+
+			if (sebsequent)
 				sbSebsequentPart.append(lexer.stringVal()).append(" ");
-			
+
 			switch (tok.name) {
 			case "SELECT":
 				splitSqlStructure.setSqlType(SqlType.SELECT);
@@ -74,11 +92,15 @@ public class SplitSqlParserDefImpl implements SplitSqlParser {
 			}
 
 			if (inProcess) {
-				if (dbName == null && (tok == Token.IDENTIFIER))
+				if (dbName == null && tok == Token.IDENTIFIER) {
 					dbName = lexer.stringVal();
-				else if (dbName != null && (tok == Token.IDENTIFIER)) {
+					previous = false;
+				} else if (dbName != null && tableName == null
+						&& tok == Token.IDENTIFIER) {
 					tableName = lexer.stringVal();
-					break;
+					
+					inProcess = false;
+					sebsequent = true;
 				}
 			}
 		} while (true);
@@ -89,9 +111,13 @@ public class SplitSqlParserDefImpl implements SplitSqlParser {
 
 		splitSqlStructure.setDbName(dbName);
 		splitSqlStructure.setTableName(tableName);
-		
+
 		splitSqlStructure.setPreviousPart(sbPreviousPart.toString());
 		splitSqlStructure.setSebsequentPart(sbSebsequentPart.toString());
+
+		// if race condition, it is not severe
+		if (!cache.containsKey(splitSqlStructure))
+			cache.put(sql, splitSqlStructure);
 
 		return splitSqlStructure;
 	}

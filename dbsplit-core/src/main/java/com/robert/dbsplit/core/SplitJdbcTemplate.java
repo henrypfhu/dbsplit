@@ -4,6 +4,8 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.CallableStatementCallback;
@@ -22,10 +24,14 @@ import org.springframework.jdbc.core.StatementCallback;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.jdbc.support.rowset.SqlRowSet;
 
+import com.robert.dbsplit.core.sql.SplitSqlParser;
 import com.robert.dbsplit.excep.NotSupportedException;
 import com.robert.dbsplit.util.SqlUtil;
 
 public class SplitJdbcTemplate implements SplitJdbcOperations {
+	protected static final Logger log = LoggerFactory
+			.getLogger(SplitJdbcTemplate.class);
+
 	protected SplitTablesHolder splitTablesHolder;
 
 	protected boolean readWriteSeparate = false;
@@ -324,6 +330,9 @@ public class SplitJdbcTemplate implements SplitJdbcOperations {
 
 	public <K> int update(K splitKey, String sql, Object... args)
 			throws DataAccessException {
+		log.trace("before split update, splitKey {} sql {} args {}", splitKey, sql,
+				args);
+
 		String[] dbTableNames = SqlUtil.getDbTableNamesUpdate(sql);
 		String dbName = dbTableNames[0];
 		String tableName = dbTableNames[1];
@@ -336,15 +345,28 @@ public class SplitJdbcTemplate implements SplitJdbcOperations {
 
 		int dbNo = splitStrategy.getDbNo(splitKey);
 		int tableNo = splitStrategy.getTableNo(splitKey);
-		sql = SqlUtil.splitUpdateSql(sql, dbNo, tableNo);
+
+		sql = SplitSqlParser.INST.parseSplitSql(sql).getSplitSql(dbNo, tableNo);
+
+		log.trace("after split update, splitKey {} sql {} args {}", splitKey, sql,
+				args);
 
 		int nodeNo = splitStrategy.getNodeNo(splitKey);
 		SplitNode sn = splitNdoes.get(nodeNo);
 
-		JdbcTemplate jt = sn.getMasterTemplate();
+		JdbcTemplate jt = getJdbcTemplate(sn, false);
 
-		return jt.update(sql, args);
+		log.trace(
+				"execute split update, splitKey {} sql {} args {} dbName {} tableName {} nodeNo {} dbNo {} tableNo {}",
+				splitKey, sql, args, dbName, tableName, nodeNo, dbNo, tableNo);
 
+		int ret = jt.update(sql, args);
+
+		log.trace(
+				"execute split update, {} records are updated, splitKey {} sql {} args {}",
+				splitKey, sql, args);
+
+		return ret;
 	}
 
 	public <K> int[] batchUpdate(K splitKey, String sql,

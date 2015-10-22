@@ -15,8 +15,6 @@ import com.robert.dbsplit.util.SqlUtil.SqlRunningBean;
 
 public class SimpleSplitJdbcTemplate extends SplitJdbcTemplate implements
 		SimpleSplitJdbcOperations {
-	private static final Logger log = LoggerFactory
-			.getLogger(SimpleSplitJdbcTemplate.class);
 
 	private enum UpdateOper {
 		INSERT, UPDATE, DELETE
