@@ -7,9 +7,9 @@ import java.util.List;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 
-import com.robert.dbsplit.core.sql.OrmUtil;
-import com.robert.dbsplit.core.sql.SqlUtil;
-import com.robert.dbsplit.core.sql.SqlUtil.SqlRunningBean;
+import com.robert.dbsplit.core.sql.util.OrmUtil;
+import com.robert.dbsplit.core.sql.util.SqlUtil;
+import com.robert.dbsplit.core.sql.util.SqlUtil.SqlRunningBean;
 
 public class SimpleSplitJdbcTemplate extends SplitJdbcTemplate implements
 		SimpleSplitJdbcOperations {

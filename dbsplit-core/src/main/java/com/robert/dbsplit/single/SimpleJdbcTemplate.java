@@ -9,9 +9,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 
-import com.robert.dbsplit.core.sql.OrmUtil;
-import com.robert.dbsplit.core.sql.SqlUtil;
-import com.robert.dbsplit.core.sql.SqlUtil.SqlRunningBean;
+import com.robert.dbsplit.core.sql.util.OrmUtil;
+import com.robert.dbsplit.core.sql.util.SqlUtil;
+import com.robert.dbsplit.core.sql.util.SqlUtil.SqlRunningBean;
 
 public class SimpleJdbcTemplate extends JdbcTemplate implements
 		SimpleJdbcOperations {
