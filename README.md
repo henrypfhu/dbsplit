@@ -10,4 +10,8 @@ Dbsplit扩展了Spring的JdbcTemplate, 在JdbcTemplate上增加了分库分表�
 
 此项目也提供了一个方便的脚本，可以一次性的建立多库多表。
 
+# 联系我们
+
+艳鹏微信：robert_lyp
+
 
