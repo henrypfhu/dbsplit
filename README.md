@@ -12,7 +12,7 @@ Dbsplit扩展了Spring的JdbcTemplate, 在JdbcTemplate上增加了分库分表�
 
 此项目也提供了一个方便的脚本，可以一次性的建立多库多表。
 
-## 怎么使用dbsplit
+## 怎么使用dbsplit?
 
 我们已经完整的实现了一个具有分库分表功能的框架dbsplit，现在，让我们提供一个示例演示在我们的应用中怎么来使用这个框架，大家也可以参考dbsplit项目中dbsplit-core/src/main/test中的源代码。
 
