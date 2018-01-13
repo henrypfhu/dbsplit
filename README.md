@@ -18,7 +18,7 @@ Dbsplit扩展了Spring的JdbcTemplate, 在JdbcTemplate上增加了分库分表�
 
 首先，假设我们应用中有个表需要增删改查，它的DDL脚本如下：
 
-```
+````sql
 drop table if exists TEST_TABLE_$I;
 
 create table TEST_TABLE_$I
@@ -31,7 +31,7 @@ create table TEST_TABLE_$I
     primary key(id),
     unique key UK_NAME(NAME)
 );
-```
+````
 
 我们把这个DDL脚本保存到table.sql文件中，然后，我们需要准备好一个Mysql的数据库实例，实例端口为localhost:3307, 因为环境的限制，我们用着一个数据库实例来模拟两个数据库实例，两个数据库实例使用同一个端口，我们为TEST_TABLE设计了2个数据库实例、每个实例2个数据库、每个数据库4个表，共16个分片表。
 
@@ -46,6 +46,7 @@ build-db-split.sh -i "localhost:3307,localhost:3307" -m test_db -n table.sql -x 
 
 然后，我们登录Mysql的命令行客户端，我们看到一共创建了4个数据库，前2个数据库属于数据库实例1，后2个数据库属于数据库实例2，每个数据库有4个表。
 
+```
 mysql> show databases;
 +--------------------+
 | Database           |
@@ -71,12 +72,13 @@ mysql> show tables;
 | TEST_TABLE_3        |
 +---------------------+
 4 rows in set (0.00 sec)
+```
 
 因此，一共我们创建了16个分片表。
 
 然后，我们定义对应这个数据库表的领域对象模型，在这个领域对象模型中，我们不需要任何注解，这是一个绿色的POJO。
 
-```
+```java
 public class TestTable {
 	private long id;
 	private String name;
@@ -146,7 +148,7 @@ public class TestTable {
 
 因为我们的应用程序需要保存这个实体，这就需要生成唯一的ID，发号器的设计和使用请参考第4章如何设计一款永不重复的高性能分布式发号器，这里我们需要配置一个发号器服务即可，代码如下所示。
 
-```
+```java
 	<bean id="idService" class="com.robert.vesta.service.factory.IdServiceFactoryBean"
 		init-method="init">
 		<property name="providerType" value="PROPERTY" />
@@ -157,7 +159,7 @@ public class TestTable {
 
 接下来，我们在Spring环境中定义这个表的分片信息，这包括数据库名称、表名称、数据库分片数、表的分片数，以及读写分离等信息，本例中我们制定数据库前缀为test_db，数据库表名为TEST_TABLE，每个实例2个数据库，每个数据库4张表，分片采用采用水平下标策略，并且打开读写分离。
 
-```
+```java
 	<bean name="splitTable" class="com.robert.dbsplit.core.SplitTable"
 		init-method="init">
 
@@ -182,7 +184,7 @@ public class TestTable {
 
 我们看到，这个splitTable引用了两个数据库实例节点：splitNode1和splitNode2，他们的声明如下：
 
-```
+```xml
 	<bean name="splitNode1" class="com.robert.dbsplit.core.SplitNode">
 		<property name="masterTemplate" ref="masterTemplate0" />
 		<property name="slaveTemplates">
@@ -205,7 +207,7 @@ public class TestTable {
 每个数据库实例节点都引用了一个数据库主模板以及若干个数据库从模板，这是用来实现读写分离的，因为我们打开了读写分离设置，所有的读操作将由dbsplit路由到数据库的从模板上，数据库的主从模板的声明引用到我们生命的数据库，因为我们是在本地做测试，这些数据源都指向了本地的Mysql数据库localhost:3307。
 
 
-```
+```xml
 	<bean id="masterTemplate0" class="org.springframework.jdbc.core.JdbcTemplate"
 		abstract="false" lazy-init="false" autowire="default"
 		dependency-check="default">
@@ -225,7 +227,7 @@ public class TestTable {
 
 到现在为止，我们定义好了表的分片信息，把我们把这个表加入到SplitTablesHolder的Bean中，代码如下所示：
 
-```
+```xml
 	<bean name="splitTablesHolder" class="com.robert.dbsplit.core.SplitTablesHolder"
 		init-method="init">
 		<property name="splitTables">
@@ -238,7 +240,7 @@ public class TestTable {
 
 接下来，我们就需要声明我们的SimpleSplitJdbcTemplate的Bean，它需要引用SplitTablesHolder的Bean，以及配置读写分离的策略，配置代码如下所示，
 
-```
+```xml
 	<bean name="simpleSplitJdbcTemplate" class="com.robert.dbsplit.core.SimpleSplitJdbcTemplate">
 		<property name="splitTablesHolder" ref="splitTablesHolder" />
 		<property name="readWriteSeparate" value="${dbsplit.readWriteSeparate}" />
@@ -247,7 +249,7 @@ public class TestTable {
 
 我们有了SimpleSplitJdbcTemplate的Bean，我们就可以把它导出给我们的服务层来使用了。这里我们通过一个测试用例来演示，在测试用例中初始化刚才我们配置的Spring环境，从Spring环境中获取SimpleSplitJdbcTemplate的Bean simpleSplitJdbcTemplate，然后，示例里面的方法插入TEST_TABLE的记录，然后，再把这条记录查询出来，代码如下所示。
 
-```
+```xml
 	public void testSimpleSplitJdbcTemplate() {
 		SimpleSplitJdbcTemplate simpleSplitJdbcTemplate = (SimpleSplitJdbcTemplate) applicationContext
 				.getBean("simpleSplitJdbcTemplate");
