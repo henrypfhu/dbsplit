@@ -249,7 +249,7 @@ public class TestTable {
 
 我们有了SimpleSplitJdbcTemplate的Bean，我们就可以把它导出给我们的服务层来使用了。这里我们通过一个测试用例来演示，在测试用例中初始化刚才我们配置的Spring环境，从Spring环境中获取SimpleSplitJdbcTemplate的Bean simpleSplitJdbcTemplate，然后，示例里面的方法插入TEST_TABLE的记录，然后，再把这条记录查询出来，代码如下所示。
 
-```xml
+```java
 	public void testSimpleSplitJdbcTemplate() {
 		SimpleSplitJdbcTemplate simpleSplitJdbcTemplate = (SimpleSplitJdbcTemplate) applicationContext
 				.getBean("simpleSplitJdbcTemplate");
